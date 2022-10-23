@@ -11,14 +11,40 @@ public class Authorization : MonoBehaviourPunCallbacks
     [SerializeField] private string _playFabTitle;
     [SerializeField] private ConnectionView _connectionView;
 
+    private string _customID;
+
     void Start()
     {
-        if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
+        _connectionView.Init();
+
+        _connectionView.SetOfflineConnectionStatus();
+
+        _connectionView.ConnectButton.interactable = false;
+        _connectionView.DisconnectButton.interactable = false;
+
+        _connectionView.LoginButton.onClick.AddListener(Login);
+        _connectionView.ConnectButton.onClick.AddListener(Connect);
+        _connectionView.DisconnectButton.onClick.AddListener(Disconnect);
+    }
+
+    private void Login()
+    {
+        if (string.IsNullOrEmpty(_connectionView.GetLogin()))
+        {
+            _connectionView.SetLoginWarning(true);
+            return;
+        }
+        else
+        {
+            _customID = _connectionView.GetLogin();
+        }
+
+        if(string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
             PlayFabSettings.staticSettings.TitleId = _playFabTitle;
 
         var request = new LoginWithCustomIDRequest
         {
-            CustomId = "TestUser",
+            CustomId = _customID,
             CreateAccount = true
         };
 
@@ -28,7 +54,11 @@ public class Authorization : MonoBehaviourPunCallbacks
                 Debug.Log(result.PlayFabId);
                 PhotonNetwork.AuthValues = new AuthenticationValues(result.PlayFabId);
                 PhotonNetwork.NickName = result.PlayFabId;
-                Connect();
+                                
+                _connectionView.ConnectButton.interactable = true;
+                _connectionView.DisconnectButton.interactable = true;
+
+                //Connect();
             },
             error =>
             {
@@ -48,7 +78,12 @@ public class Authorization : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
-        }
+        }        
+    }
+
+    private void Disconnect()
+    {
+        PhotonNetwork.Disconnect();
     }
 
     public override void OnConnectedToMaster()
@@ -57,6 +92,8 @@ public class Authorization : MonoBehaviourPunCallbacks
         Debug.Log("OnConnectedToMaster");
         if (!PhotonNetwork.InRoom)
             PhotonNetwork.JoinRandomOrCreateRoom(roomName: $"Room N{Random.Range(0, 9999)}");
+
+        _connectionView.SetOnlineConnectionStatus();
     }
 
     public override void OnCreatedRoom()
@@ -69,5 +106,12 @@ public class Authorization : MonoBehaviourPunCallbacks
     {
         base.OnJoinedRoom();
         Debug.Log($"OnJoinedRoom {PhotonNetwork.CurrentRoom.Name}");
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        base.OnDisconnected(cause);
+        Debug.Log("Disconnected");
+        _connectionView.SetOfflineConnectionStatus();
     }
 }
