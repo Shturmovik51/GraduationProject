@@ -1,4 +1,4 @@
-using Photon.Pun;
+  using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -9,6 +9,7 @@ using UnityEngine;
 public class Authorization : MonoBehaviourPunCallbacks
 {
     [SerializeField] private string _playFabTitle;
+    [SerializeField] private ConnectionView _connectionView;
 
     void Start()
     {
@@ -29,7 +30,10 @@ public class Authorization : MonoBehaviourPunCallbacks
                 PhotonNetwork.NickName = result.PlayFabId;
                 Connect();
             },
-            error => Debug.LogError(error));
+            error =>
+            {
+                Debug.LogError(error);
+            });
     }
 
     private void Connect()
