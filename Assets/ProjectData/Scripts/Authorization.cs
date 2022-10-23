@@ -1,4 +1,4 @@
-  using Photon.Pun;
+using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Authorization : MonoBehaviourPunCallbacks
+public class Authorization : MonoBehaviourPunCallbacks, System.IDisposable
 {
     [SerializeField] private string _playFabTitle;
     [SerializeField] private ConnectionView _connectionView;
@@ -113,5 +113,14 @@ public class Authorization : MonoBehaviourPunCallbacks
         base.OnDisconnected(cause);
         Debug.Log("Disconnected");
         _connectionView.SetOfflineConnectionStatus();
+    }
+
+    public void Dispose()
+    {
+        _connectionView.Clear();
+
+        _connectionView.LoginButton.onClick.RemoveAllListeners();
+        _connectionView.ConnectButton.onClick.RemoveAllListeners();
+        _connectionView.DisconnectButton.onClick.RemoveAllListeners();
     }
 }

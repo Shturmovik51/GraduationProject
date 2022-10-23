@@ -44,4 +44,8 @@ public class ConnectionView : MonoBehaviour
         _connectionStatusText.text = "Connection status: <color=green>Online</color>";
     }
 
+    public void Clear()
+    {
+        _inputField.onValueChanged.RemoveAllListeners();
+    }
 }
