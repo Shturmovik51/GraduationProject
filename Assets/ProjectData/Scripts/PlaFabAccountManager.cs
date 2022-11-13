@@ -9,11 +9,14 @@ using System;
 public class PlaFabAccountManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text _titleLable;
+    [SerializeField] private TMP_Text _catalogLable;
 
     private void Start()
     {
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountSuccess, OnError);
+        PlayFabClientAPI.GetCatalogItems(new GetCatalogItemsRequest(), OnGetCatalogSuccess, OnError);
     }
+
 
     private void OnError(PlayFabError error)
     {
@@ -26,5 +29,21 @@ public class PlaFabAccountManager : MonoBehaviour
         var accountInfo = result.AccountInfo;
         _titleLable.text = $"Welcome {accountInfo.Username} \n" +
                            $"{accountInfo.PlayFabId} \n";
+    }
+
+    private void OnGetCatalogSuccess(GetCatalogItemsResult result)
+    {
+        ShowCatalog(result.Catalog);
+        Debug.Log("Complete load catalog!");
+    }
+
+    private void ShowCatalog(List<CatalogItem> catalog)
+    {
+        _catalogLable.text = "Inventory Info:";
+
+        foreach (var item in catalog)
+        {
+            _catalogLable.text += $"\n{item.DisplayName}, cost {item.VirtualCurrencyPrices["SC"]} SC ";                                 
+        }
     }
 }
