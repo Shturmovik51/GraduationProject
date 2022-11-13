@@ -1,0 +1,93 @@
+{
+  "CatalogVersion": "FirstCatalog",
+  "Catalog": [
+    {
+      "ItemId": "useless_item_id_1",
+      "ItemClass": "UselessItems",
+      "CatalogVersion": "FirstCatalog",
+      "DisplayName": "Useless Item 1",
+      "Description": "Useless Item for no currently missing game",
+      "VirtualCurrencyPrices": {
+        "SC": 100
+      },
+      "RealCurrencyPrices": {},
+      "Tags": [
+        "Useless"
+      ],
+      "CustomData": null,
+      "Consumable": {
+        "UsageCount": 1,
+        "UsagePeriod": null,
+        "UsagePeriodGroup": null
+      },
+      "Container": null,
+      "Bundle": null,
+      "CanBecomeCharacter": false,
+      "IsStackable": true,
+      "IsTradable": false,
+      "ItemImageUrl": null,
+      "IsLimitedEdition": false,
+      "InitialLimitedEditionCount": 0,
+      "ActivatedMembership": null
+    },
+    {
+      "ItemId": "useless_item_id_2",
+      "ItemClass": "UselessItems",
+      "CatalogVersion": "FirstCatalog",
+      "DisplayName": "Useless Item 2",
+      "Description": "Useless Item for no currently missing game",
+      "VirtualCurrencyPrices": {
+        "SC": 200
+      },
+      "RealCurrencyPrices": {},
+      "Tags": [
+        "Useless"
+      ],
+      "CustomData": null,
+      "Consumable": {
+        "UsageCount": 1,
+        "UsagePeriod": null,
+        "UsagePeriodGroup": null
+      },
+      "Container": null,
+      "Bundle": null,
+      "CanBecomeCharacter": false,
+      "IsStackable": true,
+      "IsTradable": false,
+      "ItemImageUrl": null,
+      "IsLimitedEdition": false,
+      "InitialLimitedEditionCount": 0,
+      "ActivatedMembership": null
+    },
+    {
+      "ItemId": "useless_item_id_3",
+      "ItemClass": "UselessItems",
+      "CatalogVersion": "FirstCatalog",
+      "DisplayName": "Useless Item 3",
+      "Description": "Useless Item for no currently missing game",
+      "VirtualCurrencyPrices": {
+        "SC": 150
+      },
+      "RealCurrencyPrices": {},
+      "Tags": [
+        "Useless"
+      ],
+      "CustomData": null,
+      "Consumable": {
+        "UsageCount": 1,
+        "UsagePeriod": null,
+        "UsagePeriodGroup": null
+      },
+      "Container": null,
+      "Bundle": null,
+      "CanBecomeCharacter": false,
+      "IsStackable": true,
+      "IsTradable": false,
+      "ItemImageUrl": null,
+      "IsLimitedEdition": false,
+      "InitialLimitedEditionCount": 0,
+      "ActivatedMembership": null
+    }
+  ],
+  "DropTables": []
+}
