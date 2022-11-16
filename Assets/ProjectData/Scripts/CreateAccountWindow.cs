@@ -36,8 +36,12 @@ public class CreateAccountWindow : AccountDataWindowBase
         }, request =>
         {
             _awaiterWindow.SetSuccessState();
+
             Debug.Log($"Success: {_username}");
-            SceneManager.LoadScene(1);
+
+            _lobbiScreen.OpenLobbiScreen();
+
+            //SceneManager.LoadScene(1);
         }, error =>
         {
             _awaiterWindow.SetErrorState();

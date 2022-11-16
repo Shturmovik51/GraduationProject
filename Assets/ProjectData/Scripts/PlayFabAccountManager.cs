@@ -6,7 +6,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 using System;
 
-public class PlaFabAccountManager : MonoBehaviour
+public class PlayFabAccountManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text _titleLable;
     [SerializeField] private TMP_Text _catalogLable;

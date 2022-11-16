@@ -6,6 +6,7 @@ public class AccountDataWindowBase : MonoBehaviour
     [SerializeField] private InputField _usernameField;
     [SerializeField] private InputField _passwordField;
     [SerializeField] protected AwaiterWindow _awaiterWindow;
+    [SerializeField] protected LobbiScreen _lobbiScreen;
 
     protected string _username;
     protected string _password;
