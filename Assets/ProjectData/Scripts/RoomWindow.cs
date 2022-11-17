@@ -13,7 +13,6 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     [SerializeField] private Button _changeVisibilityStateButton;
     [SerializeField] private Text _changeVisibilityStateButtonText;
     [SerializeField] private Button _StartGameButton;
-    [SerializeField] private Button _createRoomButton;
 
     [SerializeField] private Transform _scrollViewContent;
     [SerializeField] private Canvas _roomVindowCanvas;
@@ -32,13 +31,16 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     }
 
     public void OpenRoomWindow()
+    {    
+        _roomVindowCanvas.enabled = true;
+    }
+
+    private void InitRoom()
     {
         _room = PhotonNetwork.CurrentRoom;
         _roomNameText.text = _room.Name;
         SetRoomAccessStatusText();
         SetRoomVisibilityStatusText();
-
-        _roomVindowCanvas.enabled = true;
     }
 
     private void ChangeRoomAccessStatus()
@@ -61,8 +63,8 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private void SetRoomVisibilityStatusText()
     {
-        _visibilityStatusText.text = _room.IsOffline ? "Offline" : "Online";
-        _changeVisibilityStateButtonText.text = _room.IsOffline ? "UNHIDE ROOM" : "HIDE ROOM";
+        _visibilityStatusText.text = _room.IsVisible ? "Visible" : "Hidden";
+        _changeVisibilityStateButtonText.text = _room.IsVisible ? "HIDE ROOM" : "UNHIDE ROOM";
     }
 
     private void OnDestroy()
@@ -87,5 +89,12 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     {
         base.OnPlayerLeftRoom(otherPlayer);
 
+    }
+
+    public override void OnCreatedRoom()
+    {
+        base.OnCreatedRoom();
+
+        InitRoom();
     }
 }
