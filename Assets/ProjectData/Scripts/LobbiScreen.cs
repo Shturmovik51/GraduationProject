@@ -14,6 +14,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     [SerializeField] private Transform _scrollViewContent;
     [SerializeField] private GameObject _roomPanelPref;
     [SerializeField] private Canvas _lobbyCanvas;
+    [SerializeField] private CreateRoomWindow _createRoomWindow;
 
     private List<RoomMiniView> _rooms;
     private string _userID;
@@ -23,7 +24,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     private void Start()
     {
         _rooms = new List<RoomMiniView>();
-        _createNewButton.onClick.AddListener(CreateRoom);
+        _createNewButton.onClick.AddListener(StartRoomCreationProcess);
         _joinSelectedRoomButton.onClick.AddListener(JointSpecificRoom);
     }
 
@@ -66,23 +67,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
 
         Debug.Log("OnJoinedLobby");
     }
-
-    private void CreateRoom()
-    {
-        var roomOptions = new RoomOptions
-        {
-            MaxPlayers = 12,
-            //CustomRoomProperties = new Hashtable { { MONEY_PROP_KEY, 400 }, { MAP_PROP_KEY, "Map_3" } },
-            //CustomRoomPropertiesForLobby = new[] { MONEY_PROP_KEY, MAP_PROP_KEY },
-            IsVisible = true,
-            IsOpen = true,
-            PublishUserId = true
-        };
-        
-        PhotonNetwork.CreateRoom($"Game Room {Random.Range(0, 100)}", roomOptions);
-
-        Debug.Log("CreateRoom");
-    }
+       
 
     private void SelectCurrentRoom(RoomMiniView currentRoom)
     {        
@@ -146,19 +131,8 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
         Debug.Log("OnRoomListUpdate");
     }
 
-    public override void OnCreatedRoom()
+    private void StartRoomCreationProcess()
     {
-        base.OnCreatedRoom();
-
-    }
-
-    public override void OnJoinedRoom()
-    {
-        base.OnJoinedRoom();
-    }
-
-    private void RefreshLobbyList()
-    {       
-
-    }
+        _createRoomWindow.OpenCreateRoomWindow();
+    }    
 }
