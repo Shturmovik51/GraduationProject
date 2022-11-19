@@ -594,6 +594,38 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1609511819}
     m_Modifications:
+    - target: {fileID: 195057971960675609, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057971960675609, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057971960675609, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057971960675609, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973151989217, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973151989217, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973151989217, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973151989217, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 195057973240113418, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
       propertyPath: _signInCanvas
       value: 
@@ -697,6 +729,22 @@ PrefabInstance:
     - target: {fileID: 195057973240113423, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
       propertyPath: m_Name
       value: CreateRoomScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973344915989, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973344915989, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973344915989, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195057973344915989, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db95549aa87224742ba78b4ed3abbbfd, type: 3}
@@ -1078,6 +1126,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1609511819}
     m_Modifications:
+    - target: {fileID: 2458307722086779105, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458307722086779105, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458307722086779105, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458307722086779105, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3229358969055794436, guid: 1ce40935950242148976f8965d44a631, type: 3}
       propertyPath: m_Name
       value: Options
@@ -1178,6 +1242,22 @@ PrefabInstance:
       propertyPath: _createAccountCanvas
       value: 
       objectReference: {fileID: 7263193346897909119}
+    - target: {fileID: 5521790434454247069, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521790434454247069, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521790434454247069, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521790434454247069, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ce40935950242148976f8965d44a631, type: 3}
 --- !u!1001 &6942014896866667538
@@ -1534,12 +1614,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8721362769702530603, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
+      propertyPath: _roomWindow
+      value: 
+      objectReference: {fileID: 1412242853}
+    - target: {fileID: 8721362769702530603, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
       propertyPath: _createRoomWindow
       value: 
       objectReference: {fileID: 1045335547}
     - target: {fileID: 8721362770526239701, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00011578525
+      value: 5.9072814
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}

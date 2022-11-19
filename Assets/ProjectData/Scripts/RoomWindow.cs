@@ -22,10 +22,11 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     [SerializeField] private TMP_Text _roomNameText;
 
     private Room _room;
-    private Dictionary<Player, TMP_Text> _players;
+    private Dictionary<Player, TextMeshProUGUI> _players;
 
     private void Start()
-    {   
+    {
+        _players = new Dictionary<Player, TextMeshProUGUI>();
         _changeAccessStateButton.onClick.AddListener(ChangeRoomAccessStatus);
         _changeVisibilityStateButton.onClick.AddListener(ChangeRoomVisibilityStatus);
     }
@@ -79,7 +80,7 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
         var textObject = new GameObject("UserName");
         textObject.transform.SetParent(_scrollViewContent);
-        var textComponent = textObject.AddComponent<TMP_Text>();
+        var textComponent = textObject.AddComponent<TextMeshProUGUI>();
         textComponent.text = newPlayer.NickName;
 
         _players.Add(newPlayer, textComponent);
@@ -93,7 +94,27 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        base.OnCreatedRoom();
+        base.OnCreatedRoom();        
+
+        //InitRoom();
+    }
+
+    public override void OnJoinedRoom()    
+    {
+        base.OnJoinedRoom();
+
+        if(PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId)
+        {
+            _changeAccessStateButton.interactable = true;
+            _changeVisibilityStateButton.interactable = true;
+            _StartGameButton.interactable = true;
+        }
+        else
+        {
+            _changeAccessStateButton.interactable = false;
+            _changeVisibilityStateButton.interactable = false;
+            _StartGameButton.interactable = false;
+        }
 
         InitRoom();
     }

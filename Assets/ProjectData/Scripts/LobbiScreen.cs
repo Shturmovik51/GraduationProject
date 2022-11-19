@@ -2,7 +2,6 @@ using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +14,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject _roomPanelPref;
     [SerializeField] private Canvas _lobbyCanvas;
     [SerializeField] private CreateRoomWindow _createRoomWindow;
+    [SerializeField] private RoomWindow _roomWindow;
 
     private List<RoomMiniView> _rooms;
     private string _userID;
@@ -32,21 +32,24 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     {
         _lobbyCanvas.enabled = true;
 
-        PlayFabClientAPI.GetAccountInfo( new GetAccountInfoRequest { }, 
-        request =>
+        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);
+
+        void OnGetInfo(GetAccountInfoResult result)
         {
-            _userID = request.AccountInfo.PlayFabId;
-            _playerName = request.AccountInfo.Username;
-        },
-        error =>
+            _userID = result.AccountInfo.PlayFabId;
+            _playerName = result.AccountInfo.Username;
+
+            PhotonNetwork.AuthValues = new AuthenticationValues(_userID);
+            PhotonNetwork.NickName = _playerName;
+            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
+        }
+
+        void OnError(PlayFabError error)
         {
             Debug.Log(error.GenerateErrorReport());
-        });
-
-        PhotonNetwork.AuthValues = new AuthenticationValues(_userID);
-        PhotonNetwork.NickName = _playerName;
-        PhotonNetwork.ConnectUsingSettings();
-        PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
+        }
+        
         //PhotonNetwork.AutomaticallySyncScene = true;
         CheckJoinButtonVisibility();
     }
@@ -60,7 +63,6 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
         Debug.Log("OnConnectedToMaster");
     }
 
-
     public override void OnJoinedLobby()
     {
         base.OnJoinedLobby();
@@ -68,7 +70,6 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedLobby");
     }
        
-
     private void SelectCurrentRoom(RoomMiniView currentRoom)
     {        
         _currentSelectedRoom = currentRoom;
@@ -102,6 +103,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     private void JointSpecificRoom()
     {
         PhotonNetwork.JoinRoom(_currentSelectedRoom.RoomInfo.Name);
+        _roomWindow.OpenRoomWindow();
     }
 
     private void CheckJoinButtonVisibility()
@@ -115,24 +117,59 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
 
         foreach (var roomInfo in roomList)
         {
-            if (_rooms.Find(room => room.RoomInfo == roomInfo))
+            var currentRoom = _rooms.Find(room => room.RoomInfo.Name == roomInfo.Name);
+            if (currentRoom != null)
             {
+                currentRoom.InitRoomMiniView(roomInfo);
+                CheckRoomVisibility(currentRoom);
+                CheckRoomPresence(currentRoom);
+
                 continue;
             }
 
             var roomObject = Instantiate(_roomPanelPref, _scrollViewContent);
             var roomMiniView = roomObject.GetComponent<RoomMiniView>();
             roomMiniView.InitRoomMiniView(roomInfo);
+            CheckRoomVisibility(roomMiniView);
             _rooms.Add(roomMiniView);
              
             roomMiniView.OnClickRoomMiniView += SelectCurrentRoom;
         }
+    }
 
-        Debug.Log("OnRoomListUpdate");
+    private void CheckRoomVisibility(RoomMiniView room)
+    {
+        if (!room.RoomInfo.IsVisible || !room.RoomInfo.IsOpen)
+        {
+            if(room.gameObject.activeInHierarchy)
+                room.gameObject.SetActive(false);
+        }
+        else
+        {
+            if (!room.gameObject.activeInHierarchy)
+                room.gameObject.SetActive(true);
+        }
+    }
+    private void CheckRoomPresence(RoomMiniView room)
+    {
+        if (room.RoomInfo.RemovedFromList)
+        {
+            room.OnClickRoomMiniView -= SelectCurrentRoom;
+            _rooms.Remove(room);    
+            Destroy(room.gameObject);
+        }
     }
 
     private void StartRoomCreationProcess()
     {
         _createRoomWindow.OpenCreateRoomWindow();
-    }    
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var room in _rooms)
+        {
+            room.OnClickRoomMiniView -= SelectCurrentRoom;
+        }
+    }
 }
