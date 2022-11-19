@@ -10,11 +10,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class RoomMiniView : MonoBehaviourPunCallbacks, IPointerClickHandler
+public class RoomMiniView : MonoBehaviour, IPointerClickHandler
 {
     public event Action<RoomMiniView> OnClickRoomMiniView;
     public bool IsSelected { get; private set; }
-    public RoomInfo RoomInfo { get; private set; }
+    public string RoomName { get; private set; }
+    public int RoomListIndex { get; private set; }
 
     [SerializeField] private TMP_Text _roomName;
     [SerializeField] private TMP_Text _roomOwner;
@@ -23,10 +24,17 @@ public class RoomMiniView : MonoBehaviourPunCallbacks, IPointerClickHandler
 
     private Color _idleColor;
 
-    public void InitRoomMiniView(RoomInfo roomInfo)
+    public void InitRoomMiniView(RoomInfo roomInfo, int index)
     {
-        RoomInfo = roomInfo;
-        _roomName.text = roomInfo.Name;
+        _roomName.text = $"Room: {roomInfo.Name}";
+        RoomName = roomInfo.Name;
+        RoomListIndex = index;
+
+        if (roomInfo.CustomProperties.TryGetValue("on", out object name))
+        {
+            _roomOwner.text = $"Owner: {name}";
+        }
+
         _idleColor = _backGroundImage.color;
         //var ownerID = roomInfo.masterClientId; 
     }
@@ -50,8 +58,7 @@ public class RoomMiniView : MonoBehaviourPunCallbacks, IPointerClickHandler
     }
 
     public void ClearRoomMiniView()
-    {
-        RoomInfo = null;
+    {        
         _roomName.text = "";
     }
 }

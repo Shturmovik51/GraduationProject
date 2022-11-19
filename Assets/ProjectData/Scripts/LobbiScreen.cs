@@ -102,7 +102,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
 
     private void JointSpecificRoom()
     {
-        PhotonNetwork.JoinRoom(_currentSelectedRoom.RoomInfo.Name);
+        PhotonNetwork.JoinRoom(_currentSelectedRoom.RoomName);
         _roomWindow.OpenRoomWindow();
     }
 
@@ -115,31 +115,31 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
     {
         base.OnRoomListUpdate(roomList);
 
-        foreach (var roomInfo in roomList)
+        for (int i = 0; i < roomList.Count; i++)        
         {
-            var currentRoom = _rooms.Find(room => room.RoomInfo.Name == roomInfo.Name);
+            var currentRoom = _rooms.Find(room => room.RoomName == roomList[i].Name);
             if (currentRoom != null)
             {
-                currentRoom.InitRoomMiniView(roomInfo);
-                CheckRoomVisibility(currentRoom);
-                CheckRoomPresence(currentRoom);
+                currentRoom.InitRoomMiniView(roomList[i], i);
+                CheckRoomVisibility(roomList[i], currentRoom);
+                CheckRoomPresence(roomList[i], currentRoom);
 
                 continue;
             }
 
             var roomObject = Instantiate(_roomPanelPref, _scrollViewContent);
             var roomMiniView = roomObject.GetComponent<RoomMiniView>();
-            roomMiniView.InitRoomMiniView(roomInfo);
-            CheckRoomVisibility(roomMiniView);
+            roomMiniView.InitRoomMiniView(roomList[i], i);
+            CheckRoomVisibility(roomList[i], roomMiniView);
             _rooms.Add(roomMiniView);
              
             roomMiniView.OnClickRoomMiniView += SelectCurrentRoom;
         }
     }
 
-    private void CheckRoomVisibility(RoomMiniView room)
+    private void CheckRoomVisibility(RoomInfo roomInfo, RoomMiniView room)
     {
-        if (!room.RoomInfo.IsVisible || !room.RoomInfo.IsOpen)
+        if (!roomInfo.IsVisible || !roomInfo.IsOpen)
         {
             if(room.gameObject.activeInHierarchy)
                 room.gameObject.SetActive(false);
@@ -150,9 +150,9 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
                 room.gameObject.SetActive(true);
         }
     }
-    private void CheckRoomPresence(RoomMiniView room)
+    private void CheckRoomPresence(RoomInfo roomInfo, RoomMiniView room)
     {
-        if (room.RoomInfo.RemovedFromList)
+        if (roomInfo.RemovedFromList)
         {
             room.OnClickRoomMiniView -= SelectCurrentRoom;
             _rooms.Remove(room);    

@@ -1,7 +1,9 @@
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
+using PlayFab.ClientModels;
+using PlayFab;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +18,12 @@ public class CreateRoomWindow : MonoBehaviourPunCallbacks
     [SerializeField] private Canvas _createRoomCanvas;
     [SerializeField] private RoomWindow _roomWindow;
 
+    private const string OWNER_NAME_KEY = "on";
+    private const string FRIEND_1_KEY = "f1";
+    private const string FRIEND_2_KEY = "f2";
+    private const string FRIEND_3_KEY = "f3";
+    private const string FRIEND_4_KEY = "f4";
+
     private bool _isVisibleOption;
     private bool _isOpenOption;
 
@@ -28,7 +36,7 @@ public class CreateRoomWindow : MonoBehaviourPunCallbacks
         _visibilityDropDown.onValueChanged.AddListener((value) => SetVisibilityOption(value));
 
         _accessDropDown.ClearOptions();
-        _accessDropDown.AddOptions(new List<string>() { "Opne", "Close" });
+        _accessDropDown.AddOptions(new List<string>() { "Open", "Close" });
         _accessDropDown.onValueChanged.AddListener((value) => SetAccessOption(value));
 
         SetVisibilityOption(_visibilityDropDown.value);
@@ -77,21 +85,39 @@ public class CreateRoomWindow : MonoBehaviourPunCallbacks
             return;
         }
 
-        var roomOptions = new RoomOptions
+        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);
+
+        void OnGetInfo(GetAccountInfoResult result)
         {
-            MaxPlayers = 12,
-            
-            //CustomRoomProperties = new Hashtable { { MONEY_PROP_KEY, 400 }, { MAP_PROP_KEY, "Map_3" } },
-            //CustomRoomPropertiesForLobby = new[] { MONEY_PROP_KEY, MAP_PROP_KEY },
-            IsVisible = _isVisibleOption,
-            IsOpen = _isOpenOption,
-            PublishUserId = true
-        };
+            var ownerName = result.AccountInfo.Username;
 
-        PhotonNetwork.CreateRoom($"{_roomName.text}", roomOptions);
+            var roomOptions = new RoomOptions
+            {
+                MaxPlayers = 5,
 
-        _roomWindow.OpenRoomWindow();
+                CustomRoomProperties = new Hashtable
+                {
+                    { OWNER_NAME_KEY, ownerName },                    
+                },
 
-        Debug.Log("CreateRoom");
+                //CustomRoomPropertiesForLobby = new[] { MONEY_PROP_KEY, MAP_PROP_KEY },
+                IsVisible = _isVisibleOption,
+                IsOpen = _isOpenOption,
+                PublishUserId = true
+            };
+
+            PhotonNetwork.CreateRoom($"{_roomName.text}", roomOptions);
+
+            _roomWindow.OpenRoomWindow();
+
+            Debug.Log("CreateRoom");
+
+
+        }
+
+        void OnError(PlayFabError error)
+        {
+            Debug.Log(error.GenerateErrorReport());
+        }        
     }
 }

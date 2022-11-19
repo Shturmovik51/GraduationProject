@@ -1,10 +1,13 @@
 using Photon.Pun;
 using Photon.Realtime;
+using PlayFab.ClientModels;
+using PlayFab;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class RoomWindow : MonoBehaviourPunCallbacks
 {
@@ -20,8 +23,9 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     [SerializeField] private TMP_Text _accessStatusText;
     [SerializeField] private TMP_Text _visibilityStatusText;
     [SerializeField] private TMP_Text _roomNameText;
+    [SerializeField] private TMP_Text _roomOwnerText;
 
-    private Room _room;
+    //private Room _room;
     private Dictionary<Player, TextMeshProUGUI> _players;
 
     private void Start()
@@ -38,40 +42,29 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private void InitRoom()
     {
-        _room = PhotonNetwork.CurrentRoom;
-        _roomNameText.text = _room.Name;
-        SetRoomAccessStatusText();
-        SetRoomVisibilityStatusText();
+        var room = PhotonNetwork.CurrentRoom;
+        _roomNameText.text = $"Room: {room.Name}";
+
+        if (room.CustomProperties.TryGetValue("on", out object name))
+        {
+            _roomOwnerText.text = $"Owner: {name}";
+        }  
     }
 
     private void ChangeRoomAccessStatus()
     {
-        _room.IsOpen = !_room.IsOpen;
-        SetRoomAccessStatusText();
+        PhotonNetwork.CurrentRoom.IsOpen = !PhotonNetwork.CurrentRoom.IsOpen;    
     }
 
     private void ChangeRoomVisibilityStatus()
     {
-        _room.IsVisible = !_room.IsVisible;
-        SetRoomVisibilityStatusText();
-    }
-
-    private void SetRoomAccessStatusText()
-    {
-        _accessStatusText.text = _room.IsOpen ? "Open" : "Close";
-        _changeAccessStateButtonText.text = _room.IsOpen ? "CLOSE ROOM" : "OPEN ROOM";
-    }
-
-    private void SetRoomVisibilityStatusText()
-    {
-        _visibilityStatusText.text = _room.IsVisible ? "Visible" : "Hidden";
-        _changeVisibilityStateButtonText.text = _room.IsVisible ? "HIDE ROOM" : "UNHIDE ROOM";
-    }
+        PhotonNetwork.CurrentRoom.IsVisible = !PhotonNetwork.CurrentRoom.IsVisible;
+    }    
 
     private void OnDestroy()
     {
         _changeAccessStateButton.onClick.RemoveAllListeners();
-         _changeVisibilityStateButton.onClick.RemoveAllListeners();
+        _changeVisibilityStateButton.onClick.RemoveAllListeners();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -94,16 +87,14 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        base.OnCreatedRoom();        
-
-        //InitRoom();
+        base.OnCreatedRoom();       
     }
 
     public override void OnJoinedRoom()    
     {
         base.OnJoinedRoom();
 
-        if(PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId)
+        if(PhotonNetwork.IsMasterClient  /*PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId*/)
         {
             _changeAccessStateButton.interactable = true;
             _changeVisibilityStateButton.interactable = true;
@@ -117,5 +108,24 @@ public class RoomWindow : MonoBehaviourPunCallbacks
         }
 
         InitRoom();
+    }
+
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        base.OnRoomPropertiesUpdate(propertiesThatChanged);               
+
+        if (propertiesThatChanged.ContainsKey(GamePropertyKey.IsOpen))
+        {
+            var accessValue = ((bool)propertiesThatChanged[GamePropertyKey.IsOpen]);
+            _accessStatusText.text = (accessValue) ? "Open" : "Close";
+            _changeAccessStateButtonText.text = (accessValue) ? "CLOSE ROOM" : "OPEN ROOM";
+        }
+
+        if (propertiesThatChanged.ContainsKey(GamePropertyKey.IsVisible))
+        {
+            var visibilityValue = ((bool)propertiesThatChanged[GamePropertyKey.IsVisible]);
+            _visibilityStatusText.text = (visibilityValue) ? "Visible" : "Hidden";
+            _changeVisibilityStateButtonText.text = (visibilityValue) ? "HIDE ROOM" : "UNHIDE ROOM";
+        }
     }
 }
