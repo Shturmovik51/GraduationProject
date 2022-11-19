@@ -100,7 +100,8 @@ public class CreateRoomWindow : MonoBehaviourPunCallbacks
                     { OWNER_NAME_KEY, ownerName },                    
                 },
 
-                //CustomRoomPropertiesForLobby = new[] { MONEY_PROP_KEY, MAP_PROP_KEY },
+                CustomRoomPropertiesForLobby = new[] { OWNER_NAME_KEY },
+
                 IsVisible = _isVisibleOption,
                 IsOpen = _isOpenOption,
                 PublishUserId = true
@@ -111,8 +112,6 @@ public class CreateRoomWindow : MonoBehaviourPunCallbacks
             _roomWindow.OpenRoomWindow();
 
             Debug.Log("CreateRoom");
-
-
         }
 
         void OnError(PlayFabError error)

@@ -134,7 +134,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
             _rooms.Add(roomMiniView);
              
             roomMiniView.OnClickRoomMiniView += SelectCurrentRoom;
-        }
+        }        
     }
 
     private void CheckRoomVisibility(RoomInfo roomInfo, RoomMiniView room)
