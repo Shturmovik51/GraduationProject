@@ -43,6 +43,7 @@ public class LobbiScreen : MonoBehaviourPunCallbacks
             PhotonNetwork.NickName = _playerName;
             PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
+            PhotonNetwork.AutomaticallySyncScene = true;
         }
 
         void OnError(PlayFabError error)

@@ -8,6 +8,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
+using Unity.VisualScripting;
 
 public class RoomWindow : MonoBehaviourPunCallbacks
 {
@@ -33,6 +35,7 @@ public class RoomWindow : MonoBehaviourPunCallbacks
         _players = new Dictionary<Player, TextMeshProUGUI>();
         _changeAccessStateButton.onClick.AddListener(ChangeRoomAccessStatus);
         _changeVisibilityStateButton.onClick.AddListener(ChangeRoomVisibilityStatus);
+        _StartGameButton.onClick.AddListener(StartGame);
     }
 
     public void OpenRoomWindow()
@@ -128,4 +131,9 @@ public class RoomWindow : MonoBehaviourPunCallbacks
             _changeVisibilityStateButtonText.text = (visibilityValue) ? "HIDE ROOM" : "UNHIDE ROOM";
         }
     }
+
+    private void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
+    }    
 }
