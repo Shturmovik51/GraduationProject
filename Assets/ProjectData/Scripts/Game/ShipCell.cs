@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class ShipCell : MonoBehaviour
 {
+    [SerializeField] private GameObject _hitEffect;
+    public bool IsSubscribed { get; private set; }
+
     private FieldCell _fieldSell;
     private LayerMask _layerMask;
 
@@ -19,14 +22,12 @@ public class ShipCell : MonoBehaviour
         {
             if (hit.collider.TryGetComponent<FieldCell>(out var fieldCell))
             {
-                _fieldSell = fieldCell;               
-                Debug.Log("hit");
-            }            
-        }
-        else
-        {
-            _fieldSell = null;
-        }
+                if (!fieldCell.IsShipTarget)
+                {
+                    _fieldSell = fieldCell;
+                }
+            }
+        }        
     }
 
     public Transform GetPositionTransform()
@@ -47,6 +48,7 @@ public class ShipCell : MonoBehaviour
         {
             _fieldSell.OnCellClick += OnCellClick;
             _fieldSell.SetAsShipTarget(true);
+            IsSubscribed = true;
         }        
     }
 
@@ -57,6 +59,7 @@ public class ShipCell : MonoBehaviour
             _fieldSell.OnCellClick -= OnCellClick;
             _fieldSell.SetAsShipTarget(false);
             _fieldSell = null;
+            IsSubscribed = false;
         }       
     }
 

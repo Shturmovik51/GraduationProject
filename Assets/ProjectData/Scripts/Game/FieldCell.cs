@@ -39,12 +39,18 @@ public class FieldCell : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        _cellBody.SetActive(false);
+        if (!IsShipTarget)
+        {
+            _cellBody.SetActive(false);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        _cellBody.SetActive(true);
+        if (!IsShipTarget)
+        {
+            _cellBody.SetActive(true);
+        }
     }           
 
     public void InitAction()
