@@ -46,6 +46,24 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""W_Button"",
+                    ""type"": ""Button"",
+                    ""id"": ""ab747c3e-2916-4165-9f59-7144886c0eb2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""S_Button"",
+                    ""type"": ""Button"",
+                    ""id"": ""ce4dbe83-2b5b-40d9-b68e-01878b01da74"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Mouse_L"",
                     ""type"": ""Button"",
                     ""id"": ""34a4a991-fa08-461b-a0d2-5edd53de4b19"",
@@ -108,6 +126,28 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""action"": ""Mouse_R"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0d28ef1d-bfde-4a9f-8c46-bee6c91d3294"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyBoard and Mouse"",
+                    ""action"": ""W_Button"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""203ff59a-51d4-45bd-b385-894b5807da24"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyBoard and Mouse"",
+                    ""action"": ""S_Button"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -135,6 +175,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_A_Button = m_Player.FindAction("A_Button", throwIfNotFound: true);
         m_Player_D_Button = m_Player.FindAction("D_Button", throwIfNotFound: true);
+        m_Player_W_Button = m_Player.FindAction("W_Button", throwIfNotFound: true);
+        m_Player_S_Button = m_Player.FindAction("S_Button", throwIfNotFound: true);
         m_Player_Mouse_L = m_Player.FindAction("Mouse_L", throwIfNotFound: true);
         m_Player_Mouse_R = m_Player.FindAction("Mouse_R", throwIfNotFound: true);
     }
@@ -198,6 +240,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_A_Button;
     private readonly InputAction m_Player_D_Button;
+    private readonly InputAction m_Player_W_Button;
+    private readonly InputAction m_Player_S_Button;
     private readonly InputAction m_Player_Mouse_L;
     private readonly InputAction m_Player_Mouse_R;
     public struct PlayerActions
@@ -206,6 +250,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         public PlayerActions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @A_Button => m_Wrapper.m_Player_A_Button;
         public InputAction @D_Button => m_Wrapper.m_Player_D_Button;
+        public InputAction @W_Button => m_Wrapper.m_Player_W_Button;
+        public InputAction @S_Button => m_Wrapper.m_Player_S_Button;
         public InputAction @Mouse_L => m_Wrapper.m_Player_Mouse_L;
         public InputAction @Mouse_R => m_Wrapper.m_Player_Mouse_R;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -223,6 +269,12 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @D_Button.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnD_Button;
                 @D_Button.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnD_Button;
                 @D_Button.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnD_Button;
+                @W_Button.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnW_Button;
+                @W_Button.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnW_Button;
+                @W_Button.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnW_Button;
+                @S_Button.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnS_Button;
+                @S_Button.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnS_Button;
+                @S_Button.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnS_Button;
                 @Mouse_L.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_L;
                 @Mouse_L.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_L;
                 @Mouse_L.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_L;
@@ -239,6 +291,12 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @D_Button.started += instance.OnD_Button;
                 @D_Button.performed += instance.OnD_Button;
                 @D_Button.canceled += instance.OnD_Button;
+                @W_Button.started += instance.OnW_Button;
+                @W_Button.performed += instance.OnW_Button;
+                @W_Button.canceled += instance.OnW_Button;
+                @S_Button.started += instance.OnS_Button;
+                @S_Button.performed += instance.OnS_Button;
+                @S_Button.canceled += instance.OnS_Button;
                 @Mouse_L.started += instance.OnMouse_L;
                 @Mouse_L.performed += instance.OnMouse_L;
                 @Mouse_L.canceled += instance.OnMouse_L;
@@ -262,6 +320,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
     {
         void OnA_Button(InputAction.CallbackContext context);
         void OnD_Button(InputAction.CallbackContext context);
+        void OnW_Button(InputAction.CallbackContext context);
+        void OnS_Button(InputAction.CallbackContext context);
         void OnMouse_L(InputAction.CallbackContext context);
         void OnMouse_R(InputAction.CallbackContext context);
     }

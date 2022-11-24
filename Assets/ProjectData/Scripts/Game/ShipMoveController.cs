@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Engine;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,12 +12,16 @@ public class ShipMoveController : IUpdatable, IController
     private Ship _movedShip;
     private Vector3 _offset;
     private LayerMask _layerMaskForMoveShip;
+    private bool _isRotating;
+    private Sequence _rotationSequence;
 
-    public ShipMoveController()
+    public ShipMoveController(UserInput input)
     {
         _mouse = Mouse.current;
         _camera = Camera.main;
         _layerMaskForMoveShip = LayerMask.GetMask("RaycasterSurface");
+
+        input.Player.Mouse_R.performed += (context) => RotateShip();
     }
 
     public void LocalUpdate(float deltaTime)
@@ -38,15 +43,31 @@ public class ShipMoveController : IUpdatable, IController
     {
         _movedShip = movedShip;
         _movedShip.ClearShipPosition();
-        _offset = offset;
+        _offset = offset;       
     }
 
     public void ClearData()
     {
         if( _movedShip != null)
         {
-            _movedShip.SetShipPosition();
+            DOTween.Kill($"Rotate");
+            _movedShip.SetShipPosition(_isRotating);
             _movedShip = null;
+            _isRotating = false;
+        }
+    }
+
+    public void RotateShip()
+    {
+        if(_movedShip != null && !_isRotating)
+        {
+            _isRotating = true;
+            var step = _movedShip.transform.rotation * Quaternion.Euler(0, 90, 0);
+           
+            _rotationSequence = DOTween.Sequence();
+            _rotationSequence.SetId($"Rotate");
+            _rotationSequence.Append(_movedShip.transform.DORotateQuaternion(step, 0.5f));
+            _rotationSequence.OnComplete(() => _isRotating = false);
         }
     }
 }

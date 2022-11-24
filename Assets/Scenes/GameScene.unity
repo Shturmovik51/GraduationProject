@@ -3987,13 +3987,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5008920bf471bc24b835d478d2d619cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 2268558046552856532, guid: 3b8a276471d498449b23407bacd8bdae, type: 3}
-  _masterTransform: {fileID: 1932446385}
-  _opponentTransform: {fileID: 1191950002}
-  _masterCellsHolderLeft: {fileID: 1809270027}
-  _masterCellsHolderRight: {fileID: 1533928475}
-  _opponentCellsHolderLeft: {fileID: 555669135}
-  _opponentCellsHolderRight: {fileID: 796962796}
+  _gameData:
+    UserViewField: {fileID: 2268558046552856532, guid: 3b8a276471d498449b23407bacd8bdae, type: 3}
+    MasterCellsHolderLeft: {fileID: 1809270027}
+    MasterCellsHolderRight: {fileID: 1533928475}
+    OpponentCellsHolderLeft: {fileID: 555669135}
+    OpponentCellsHolderRight: {fileID: 796962796}
+    MasterTransform: {fileID: 1932446385}
+    OpponentTransform: {fileID: 1191950002}
 --- !u!1001 &283642053
 PrefabInstance:
   m_ObjectHideFlags: 0

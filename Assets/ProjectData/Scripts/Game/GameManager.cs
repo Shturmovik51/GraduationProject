@@ -9,15 +9,8 @@ using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCallback
-{
-    [SerializeField] private GameObject _playerPrefab;
-    [SerializeField] private Transform _masterTransform;
-    [SerializeField] private Transform _opponentTransform;
-
-    [SerializeField] private GameObject _masterCellsHolderLeft;
-    [SerializeField] private GameObject _masterCellsHolderRight;
-    [SerializeField] private GameObject _opponentCellsHolderLeft;
-    [SerializeField] private GameObject _opponentCellsHolderRight;
+{   
+    [SerializeField] private GameData _gameData;
 
     private List<FieldCell> _masterCellsLeft;
     private List<FieldCell> _masterCellsRight;
@@ -25,7 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     private List<FieldCell> _opponentCellsRight;
 
     private ControllersManager _controllersManager;
-
+    private PlayerFieldView _playerFieldView;
     public string UserID { get; private set; }
     public string PlayerName { get; private set; }
 
@@ -33,23 +26,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     {     
         if (PhotonNetwork.IsMasterClient)
         {
-            Instantiate(_playerPrefab, _masterTransform);
+            var playerObject = Instantiate(_gameData.UserViewField, _gameData.MasterTransform);
+            _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
         }
         else
         {
-            Instantiate(_playerPrefab, _opponentTransform);
+            var playerObject = Instantiate(_gameData.UserViewField, _gameData.OpponentTransform);
+            _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
         }
     }  
 
     private void Start()
     {    
-        _masterCellsLeft = _masterCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
-        _masterCellsRight = _masterCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
-        _opponentCellsLeft = _opponentCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
-        _opponentCellsRight = _opponentCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
+        _masterCellsLeft = _gameData.MasterCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
+        _masterCellsRight = _gameData.MasterCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
+        _opponentCellsLeft = _gameData.OpponentCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
+        _opponentCellsRight = _gameData.OpponentCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
         
         _controllersManager = new ControllersManager();
-        new GameInitializator(_controllersManager);
+        new GameInitializator(_controllersManager, _playerFieldView);
         _controllersManager.Initialization();
 
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);

@@ -10,12 +10,14 @@ public class Ship : MonoBehaviour
 
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
+    private Quaternion _droppedRotation;
     private LayerMask _shipsLayer;
 
     private void Awake()
     {
         _shipCells = GetComponentsInChildren<ShipCell>().ToList();
         _droppedPosition = transform.position;
+        _droppedRotation = transform.rotation;
         _shipsLayer = LayerMask.GetMask("ShipsLayer");
     }
 
@@ -27,8 +29,16 @@ public class Ship : MonoBehaviour
         }
     }
 
-    public void SetShipPosition()
+    public void SetShipPosition(bool isRotating)
     {
+        if (isRotating)
+        {
+            ClearShipPosition();
+            transform.position = _droppedPosition;
+            transform.rotation = _droppedRotation;
+            return;
+        }
+
         foreach (var cell in _shipCells)
         {
             cell.FindCell();
@@ -56,7 +66,8 @@ public class Ship : MonoBehaviour
         if (pointTransform != null)
         {            
             transform.position = new Vector3 (pointTransform.position.x, transform.position.y, pointTransform.position.z);
-            _droppedPosition = transform.position;            
+            _droppedPosition = transform.position;
+            _droppedRotation = transform.rotation;
         }
     }
 
