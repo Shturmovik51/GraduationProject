@@ -6,4 +6,7 @@ public enum EventType
 {
     None = 0,
     CellClick = 1,
+    Readiness = 2,
+    StartRolling = 3,
+    SendRollData = 4,
 }

@@ -1,6 +1,7 @@
 using Engine;
 using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -19,8 +20,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
 
     private ControllersManager _controllersManager;
     private PlayerFieldView _playerFieldView;
-    public string UserID { get; private set; }
-    public string PlayerName { get; private set; }
+
+    private LoadedPlayerInfo _playerInfo;
+
+    private bool _isInitialised;
 
     private void Awake()
     {     
@@ -42,57 +45,85 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
         _masterCellsRight = _gameData.MasterCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
         _opponentCellsLeft = _gameData.OpponentCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
         _opponentCellsRight = _gameData.OpponentCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
-        
-        _controllersManager = new ControllersManager();
-        new GameInitializator(_controllersManager, _playerFieldView);
-        _controllersManager.Initialization();
+           
 
-        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);
+        if (PhotonNetwork.IsConnected)
+        {
+            PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);
+        }
+        else
+        {
+            InitCells();
+            InitGame();
+            _isInitialised = true;
+        }
 
         void OnGetInfo(GetAccountInfoResult result)
         {
-            UserID = result.AccountInfo.PlayFabId;
-            PlayerName = result.AccountInfo.Username;
+            _playerInfo = new LoadedPlayerInfo();
+
+            _playerInfo.SetPlayerID(result.AccountInfo.PlayFabId);
+            _playerInfo.SetPlayerName(result.AccountInfo.Username);
 
             //PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
-            PhotonNetwork.NickName = PlayerName;
+            PhotonNetwork.NickName = result.AccountInfo.Username;
             //PhotonNetwork.AutomaticallySyncScene = true;
-
             InitCells();
+            InitGame();
+
+            _isInitialised = true;
         }
 
         void OnError(PlayFabError error)
         {
             Debug.Log(error.GenerateErrorReport());
         }
-
     }   
+
+    private void InitGame()
+    {
+        _controllersManager = new ControllersManager();
+        new GameInitializator(_controllersManager, _playerFieldView, _masterCellsLeft, _masterCellsRight,
+                _opponentCellsLeft, _opponentCellsRight, _playerInfo, _gameData);
+
+        _controllersManager.Initialization();
+    }
 
     private void Update()
     {
+        if (!_isInitialised) return;
+
         var deltaTime = Time.deltaTime;
         _controllersManager.LocalUpdate(deltaTime);
     }
 
     private void LateUpdate()
     {
+        if (!_isInitialised) return;
+
         var deltaTime = Time.deltaTime;
         _controllersManager.LocalLateUpdate(deltaTime);
     }
 
     private void FixedUpdate()
     {
+        if (!_isInitialised) return;
+
         var fixedDeltaTime = Time.fixedDeltaTime;
         _controllersManager.LocalFixedUpdate(fixedDeltaTime);
     }
 
     private void OnGUI()
     {
+        if (!_isInitialised) return;
+
         _controllersManager.LocalOnGUI();
     }
 
     private void OnDestroy()
     {
+        if (!_isInitialised) return;
+
         _controllersManager.CleanUp();
     }
 
@@ -100,10 +131,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     {
         for (int i = 0; i < _masterCellsLeft.Count; i++)
         {
-            _masterCellsLeft[i].InitCell(i, UserID);
-            _masterCellsRight[i].InitCell(i, UserID);
-            _opponentCellsLeft[i].InitCell(i, UserID);
-            _opponentCellsRight[i].InitCell(i, UserID);
+            _masterCellsLeft[i].InitCell(i, _playerInfo.PlayerID);
+            _masterCellsRight[i].InitCell(i, _playerInfo.PlayerID);
+            _opponentCellsLeft[i].InitCell(i, _playerInfo.PlayerID);
+            _opponentCellsRight[i].InitCell(i, _playerInfo.PlayerID);
 
             PhotonNetwork.AddCallbackTarget(_masterCellsLeft[i]);
             PhotonNetwork.AddCallbackTarget(_masterCellsRight[i]);
@@ -120,9 +151,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
 
                 object[] result = (object[])photonEvent.CustomData;
 
-                if (UserID != (string)result[1])
+                if (_playerInfo.PlayerID != (string)result[1])
                 {
                     if (PhotonNetwork.IsMasterClient)
+                    {
+                        _masterCellsLeft[(int)result[0]].InitAction();
+                    }
+                    else if(!PhotonNetwork.IsMasterClient)
+                    {
+                        _opponentCellsLeft[(int)result[0]].InitAction();
+                    }
+                }
+                else if(_playerInfo.PlayerID == (string)result[1])
+                {
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        _opponentCellsLeft[(int)result[0]].InitAction();
+                    }
+                    else if (!PhotonNetwork.IsMasterClient)
                     {
                         _masterCellsLeft[(int)result[0]].InitAction();
                     }

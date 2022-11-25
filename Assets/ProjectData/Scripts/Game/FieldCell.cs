@@ -27,7 +27,7 @@ public class FieldCell : MonoBehaviour
 
     public bool IsBattleFieldCell => _isBattleFieldCell;
     public bool IsShipTarget { get; private set; }
-    public bool IsActionable { get; private set; }
+    public bool IsUnableToClick { get; private set; }
     public bool IsUsed { get; private set; }
     public int Arrayindex { get; private set; }
 
@@ -35,6 +35,7 @@ public class FieldCell : MonoBehaviour
     {
         _nameID = gameObject.name;
         _startBodyTransform = transform;
+        IsUnableToClick = true;  // убрать
     }
 
     private void OnTriggerEnter(Collider other)
@@ -51,12 +52,10 @@ public class FieldCell : MonoBehaviour
         {
             _cellBody.SetActive(true);
         }
-    }           
+    }  
 
     public void InitAction()
     {
-        SendClickEvent(EventType.CellClick, Arrayindex);
-
         OnCellClick?.Invoke();
         IsUsed = true;              
 
@@ -77,7 +76,7 @@ public class FieldCell : MonoBehaviour
 
     private void SetPointedState()
     {
-        if (!IsActionable) return;
+        if (!IsUnableToClick) return;
 
         DOTween.Kill($"Down {_nameID}");
         _pointerEnterSequence = DOTween.Sequence();
@@ -87,7 +86,7 @@ public class FieldCell : MonoBehaviour
 
     private void SetUnpointedState()
     {
-        if (!IsActionable) return;
+        if (!IsUnableToClick) return;
 
         DOTween.Kill($"Up {_nameID}");
         _pointerExitSequence = DOTween.Sequence();
@@ -101,17 +100,23 @@ public class FieldCell : MonoBehaviour
         _user = user;
     }
 
-    public void SendClickEvent(EventType eventType, int value, ReceiverGroup receiverGroup = ReceiverGroup.All)
-    {        
+    public void SetUnableToClick(bool status)
+    {
+        IsUnableToClick = status;
+    }
+
+    public void SendClickEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
         SendOptions sendOptions = new SendOptions { Reliability = true };
         //int send = value;
         object[] sendData = new object[]
         {
-            value,
+            Arrayindex,
             _user
         };
 
-        PhotonNetwork.RaiseEvent((byte)(int)eventType, sendData, options, sendOptions);        
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.CellClick, sendData, options, sendOptions);        
     }
 }

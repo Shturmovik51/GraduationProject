@@ -10,7 +10,9 @@ public class GameData
     [field: SerializeField] public GameObject MasterCellsHolderRight;
     [field: SerializeField] public GameObject OpponentCellsHolderLeft;
     [field: SerializeField] public GameObject OpponentCellsHolderRight;
-                            
+
+    [field: SerializeField] public PlayerView PlayerView;
+
     [field: SerializeField] public Transform MasterTransform;
     [field: SerializeField] public Transform OpponentTransform;
 }

@@ -36,8 +36,9 @@ public class MouseRaycaster
 
             if (hit.collider.TryGetComponent<FieldCell>(out var fieldSell))
             {
-                if (fieldSell.IsBattleFieldCell && !fieldSell.IsUsed)
+                if (fieldSell.IsBattleFieldCell && !fieldSell.IsUsed && fieldSell.IsUnableToClick)
                 {
+                    fieldSell.SendClickEvent();
                     fieldSell.InitAction();
                 }
             }
