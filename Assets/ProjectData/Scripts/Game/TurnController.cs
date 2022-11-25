@@ -1,3 +1,4 @@
+using DG.Tweening;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -13,6 +14,8 @@ public class TurnController : IOnEventCallback
     private string _playerName;
     private string _playerID;
     private bool _isReadyForRoll;
+    private bool _isRolling;
+    private bool _isCompleteRolling;
 
     public TurnController(List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsLeft, List<FieldCell> opponentCellsRight, GameData gameData,
@@ -55,8 +58,10 @@ public class TurnController : IOnEventCallback
         PhotonNetwork.RaiseEvent((byte)(int)EventType.StartRolling, _playerID, options, sendOptions);
     }
 
-    private void SendRollValueEvent(int value)
+    private void SendRollEvent(int diceIndex)
     {
+        _isCompleteRolling = true;
+
         ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
         SendOptions sendOptions = new SendOptions { Reliability = true };
@@ -64,10 +69,18 @@ public class TurnController : IOnEventCallback
         object[] data = new object[]
         {
             _playerID,
-            value,
+            diceIndex,
         };
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.SendRollData, data, options, sendOptions);
+    }
+    private void SendStartBattleEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.StartBattle, _playerID, options, sendOptions);
     }
 
     public void OnEvent(EventData photonEvent)
@@ -82,7 +95,7 @@ public class TurnController : IOnEventCallback
 
                     if (_isReadyForRoll)
                     {
-                        Df();
+                        SendStartRollingEvent();
                     }
                 }
                 break;
@@ -100,7 +113,17 @@ public class TurnController : IOnEventCallback
                 if (_playerID != (string)resultSendRollData[0])                    
                 {
                     _playerView.SetOpponentRollValue((int)resultSendRollData[1]);
+
+                    if (_isCompleteRolling)
+                    {
+                        AwaitForBattleStage();
+                    }
                 }
+
+                break;
+            case EventType.StartBattle:
+
+                StartBattleStage();                
 
                 break;
         }
@@ -110,22 +133,55 @@ public class TurnController : IOnEventCallback
     {
         _playerView.SetPlacementStage(SendReadinessEvent);
     }
-
-    private void Df()
-    {
-        SendStartRollingEvent();
+   
+    private void StartRollingStage()
+    {        
+        _playerView.SetRollStage(RollingSystem);
     }
 
-    private void StartRollingStage()
+    private void AwaitForBattleStage()
     {
-        //SendStartRollingEvent();
-        _playerView.SetRollStage(RollingSystem);
+        var awaitSequence = DOTween.Sequence();
+        awaitSequence.AppendInterval(2);
+        awaitSequence.OnComplete(SendStartBattleEvent);        
+    }
+
+    private void StartBattleStage()
+    {
+        _playerView.SetBattleStage(_playerView.PlayerRolledValue > _playerView.OpponentRolledValue);        
     }
 
     private void RollingSystem()
     {
-        SendRollValueEvent(15);
+        _isRolling = true;
+
+        var timer = DOTween.Sequence();
+        timer.AppendInterval(4);
+        timer.OnComplete(() => _isRolling = false);
+
+        GetRandomValue();
+
+        void GetRandomValue()
+        {
+            var roll = DOTween.Sequence();
+            roll.AppendInterval(0.2f);
+            roll.OnComplete(() =>
+            {     
+                var (value, index) = _playerView.GetRandomDiceValue();               
+
+                if (_isRolling)
+                {
+                    GetRandomValue();
+                }
+                else
+                {
+                    SendRollEvent(index);
+                }
+            });
+        }
     }
+
+
 
 
 }

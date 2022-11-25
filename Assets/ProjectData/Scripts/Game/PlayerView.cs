@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,8 +12,13 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private TMP_Text _opponentNameText;
     [SerializeField] private TMP_Text _opponentInfoText;
     [SerializeField] private TMP_Text _opponentActionText;
-
     [SerializeField] private Button _actionButton;
+    [SerializeField] private Image _plyerDiceImage;
+    [SerializeField] private Image _opponentDiceImage;
+    [SerializeField] private List<DiceValue> _rollSystem;
+
+    public int PlayerRolledValue { get; private set; }
+    public int OpponentRolledValue { get; private set; }
 
     public void SetPlacementStage(UnityAction action)
     {
@@ -35,6 +39,7 @@ public class PlayerView : MonoBehaviour
 
         _actionButton.interactable = true;
         _actionButton.onClick.AddListener(action);
+        _actionButton.onClick.AddListener(ShowDices);
     }
 
     public void SetOpponentActionText(string text)
@@ -44,13 +49,45 @@ public class PlayerView : MonoBehaviour
 
     public void SetOpponentRollValue(int value)
     {
-        _opponentActionText.text = value.ToString();
+        _opponentActionText.enabled = false;
+        _opponentInfoText.enabled = false;
+        _opponentDiceImage.enabled = true;
+        var dice = _rollSystem[value];
+        _opponentDiceImage.sprite = dice.Sprite;
+        OpponentRolledValue = dice.Value;
     }
 
     public void SetWaitingForRollStage()
     {
         _actionTitleText.text = "Waiting Opponent";
         _actionButton.interactable = false;
+    }
+
+    public (int value, int index) GetRandomDiceValue()
+    {
+        var index = Random.Range(0, _rollSystem.Count);
+        var dice = _rollSystem[index];
+        _plyerDiceImage.sprite = dice.Sprite;
+        PlayerRolledValue = dice.Value;
+        return (dice.Value, index);
+    }
+
+    public void SetBattleStage(bool isPlayerTurn)
+    {
+        _plyerDiceImage.enabled = false;
+        _opponentDiceImage.enabled = false;
+        _opponentInfoText.enabled = true;
+        _actionButton.gameObject.SetActive(true);
+        _actionButtonText.text = "Surrender";
+        _actionButton.onClick.RemoveAllListeners();
+        //_actionButton.onClick.AddListener();
+        _actionTitleText.text = isPlayerTurn ? "It's Your Turn" : "Wait, Fear and Pray";
+    }
+
+    private void ShowDices()
+    {
+        _actionButton.gameObject.SetActive(false);
+        _plyerDiceImage.enabled = true;
     }
 
 }
