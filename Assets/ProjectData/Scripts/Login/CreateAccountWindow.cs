@@ -39,7 +39,7 @@ public class CreateAccountWindow : AccountDataWindowBase
 
             Debug.Log($"Success: {_username}");
 
-            _lobbiScreen.OpenLobbiScreen();
+            _characterScreen.OpenCharacterScreen();
 
             //SceneManager.LoadScene(1);
         }, error =>

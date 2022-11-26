@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LobbiScreen : MonoBehaviourPunCallbacks
+public class LobbyScreen : MonoBehaviourPunCallbacks
 {
     [SerializeField] private Button _createNewButton;
     [SerializeField] private Button _joinSelectedRoomButton;
