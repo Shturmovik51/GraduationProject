@@ -7369,6 +7369,7 @@ MonoBehaviour:
   _backCreatePanelButton: {fileID: 1732289155}
   _creationPanel: {fileID: 1546639398}
   _inputCharacterNameField: {fileID: 7566384647121930669}
+  _lobbiScreen: {fileID: 1321479137}
 --- !u!114 &5605115474721897798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8194,7 +8195,7 @@ PrefabInstance:
       objectReference: {fileID: 1045335547}
     - target: {fileID: 8721362770526239701, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.30830598
+      value: 0.00028499277
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
