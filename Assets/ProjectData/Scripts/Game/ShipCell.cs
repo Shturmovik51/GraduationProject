@@ -65,6 +65,6 @@ public class ShipCell : MonoBehaviour
 
     private void OnCellClick()
     {
-
+        _hitEffect.SetActive(true);
     }
 }

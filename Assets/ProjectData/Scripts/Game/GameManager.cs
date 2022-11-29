@@ -5,6 +5,7 @@ using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
+using PlayFab.Public;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -70,7 +71,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
             //PhotonNetwork.AutomaticallySyncScene = true;
             InitCells();
             InitGame();
-
             _isInitialised = true;
         }
 
@@ -129,6 +129,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
 
     private void InitCells()
     {
+        if (!PhotonNetwork.IsConnected)
+            return;
         for (int i = 0; i < _masterCellsLeft.Count; i++)
         {
             _masterCellsLeft[i].InitCell(i, _playerInfo.PlayerID);

@@ -2,6 +2,7 @@ using DG.Tweening;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using PlayFab;
 using System.Collections.Generic;
 
 public class TurnController : IOnEventCallback
@@ -74,6 +75,7 @@ public class TurnController : IOnEventCallback
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.SendRollData, data, options, sendOptions);
     }
+
     private void SendStartBattleEvent()
     {
         ReceiverGroup receiverGroup = ReceiverGroup.All;
@@ -82,6 +84,23 @@ public class TurnController : IOnEventCallback
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.StartBattle, _playerID, options, sendOptions);
     }
+    private void SendSincFieldsEvent(int intData)
+    {
+        _isCompleteRolling = true;
+
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        object[] eventContent = new object[]
+        {
+            _playerID,
+            intData,
+        };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.SincFields, eventContent, options, sendOptions);
+    }
+
 
     public void OnEvent(EventData photonEvent)
     {
@@ -121,10 +140,32 @@ public class TurnController : IOnEventCallback
                 }
 
                 break;
-            case EventType.StartBattle:
 
+            case EventType.SincFields:
+
+                object[] resultSincData = (object[])photonEvent.CustomData;
+
+                if (_playerID != (string)resultSincData[0])
+                {
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        _masterCellsRight[(int)resultSincData[1]].SetAsShipTarget(true);
+                    }
+                    else if(!PhotonNetwork.IsMasterClient)
+                    {
+                        _opponentCellsRight[(int)resultSincData[1]].SetAsShipTarget(true);
+                    }
+                }
+
+                break;
+
+            case EventType.StartBattle:
+                
                 StartBattleStage();                
 
+                break;
+
+            default:
                 break;
         }
     }
@@ -143,13 +184,10 @@ public class TurnController : IOnEventCallback
     {
         var awaitSequence = DOTween.Sequence();
         awaitSequence.AppendInterval(2);
-        awaitSequence.OnComplete(SendStartBattleEvent);        
-    }
-
-    private void StartBattleStage()
-    {
-        _playerView.SetBattleStage(_playerView.PlayerRolledValue > _playerView.OpponentRolledValue);        
-    }
+        awaitSequence.AppendCallback(SinchronizeFields);
+        awaitSequence.AppendInterval(1);
+        awaitSequence.OnComplete(SendStartBattleEvent);
+    }   
 
     private void RollingSystem()
     {
@@ -181,7 +219,32 @@ public class TurnController : IOnEventCallback
         }
     }
 
+    private void SinchronizeFields()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            for (int i = 0; i < _masterCellsLeft.Count; i++)
+            {
+                if (_masterCellsLeft[i].IsShipTarget)
+                {
+                    SendSincFieldsEvent(i);
+                }
+            }
+        }
+        else if (!PhotonNetwork.IsMasterClient)
+        {
+            for (int i = 0; i < _opponentCellsLeft.Count; i++)
+            {
+                if (_opponentCellsLeft[i].IsShipTarget)
+                {
+                    SendSincFieldsEvent(i);
+                }
+            }
+        }
+    }
 
-
-
+    private void StartBattleStage()
+    {
+        _playerView.SetBattleStage(_playerView.PlayerRolledValue > _playerView.OpponentRolledValue);
+    }
 }

@@ -26,7 +26,7 @@ public class FieldCell : MonoBehaviour
     private Transform _startBodyTransform;
 
     public bool IsBattleFieldCell => _isBattleFieldCell;
-    public bool IsShipTarget { get; private set; }
+    [field: SerializeField] public bool IsShipTarget { get; private set; }
     public bool IsUnableToClick { get; private set; }
     public bool IsUsed { get; private set; }
     public int Arrayindex { get; private set; }
@@ -57,15 +57,25 @@ public class FieldCell : MonoBehaviour
     public void InitAction()
     {
         OnCellClick?.Invoke();
-        IsUsed = true;              
+        IsUsed = true;
 
-        if (!IsShipTarget)
+        if (IsBattleFieldCell)
         {
-            _missMarker.SetActive(true);
+            if (!IsShipTarget)
+            {
+                _missMarker.SetActive(true);
+            }
+            else
+            {
+                _hitMarker.SetActive(true);
+            }
         }
-        else
+        else if(!IsBattleFieldCell)
         {
-            _hitMarker.SetActive(true);
+            if (!IsShipTarget)
+            {
+                _missMarker.SetActive(true);
+            }            
         }
     }
     

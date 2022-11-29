@@ -9,5 +9,6 @@ public enum EventType
     Readiness = 2,
     StartRolling = 3,
     SendRollData = 4,
-    StartBattle = 5,
+    SincFields = 5,
+    StartBattle = 6,
 }

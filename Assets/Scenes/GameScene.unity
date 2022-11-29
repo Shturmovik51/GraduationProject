@@ -17429,6 +17429,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1533928476}
     m_Modifications:
+    - target: {fileID: 1114974656746338723, guid: 4f46aa61ad9f3504ead029b4a91c612f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1931559151976249815, guid: 4f46aa61ad9f3504ead029b4a91c612f, type: 3}
       propertyPath: _isBattleFieldCell
       value: 1
