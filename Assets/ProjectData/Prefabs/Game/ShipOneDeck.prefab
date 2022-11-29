@@ -135,6 +135,8 @@ MonoBehaviour:
   - {fileID: 7758572768875721316}
   - {fileID: 1596969803843947296}
   - {fileID: 6079529946816346150}
+  _body: {fileID: 1748733607737413081}
+  _shipType: 1
 --- !u!65 &1748733605924832224
 BoxCollider:
   m_ObjectHideFlags: 0

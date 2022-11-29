@@ -11,6 +11,8 @@ public class TurnController : IOnEventCallback
     private List<FieldCell> _masterCellsRight;
     private List<FieldCell> _opponentCellsLeft;
     private List<FieldCell> _opponentCellsRight;
+    private List<Ship> _masterShips;
+    private List<Ship> _opponentShips;
     private PlayerView _playerView;
     private string _playerName;
     private string _playerID;
@@ -26,9 +28,12 @@ public class TurnController : IOnEventCallback
         _masterCellsRight = masterCellsRight;
         _opponentCellsLeft = opponentCellsLeft;
         _opponentCellsRight = opponentCellsRight;
-        _playerView = gameData.PlayerView;
 
-        if(playerinfo != null)
+        _playerView = gameData.PlayerView;
+        _masterShips = gameData.MasterShips;
+        _opponentShips = gameData.MasterShips;
+
+        if (playerinfo != null)
         {
             _playerName = playerinfo.PlayerName;
             _playerID = playerinfo.PlayerID;
@@ -47,7 +52,7 @@ public class TurnController : IOnEventCallback
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
         SendOptions sendOptions = new SendOptions { Reliability = true };                
 
-        PhotonNetwork.RaiseEvent((byte)(int)EventType.Readiness, _playerID, options, sendOptions);
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.ReadyForRoll, _playerID, options, sendOptions);
     }
 
     private void SendStartRollingEvent()
@@ -57,6 +62,15 @@ public class TurnController : IOnEventCallback
         SendOptions sendOptions = new SendOptions { Reliability = true };        
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.StartRolling, _playerID, options, sendOptions);
+    }
+
+    private void SendStartSynchronizingFieldsEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.StartSync, _playerID, options, sendOptions);
     }
 
     private void SendRollEvent(int diceIndex)
@@ -98,7 +112,7 @@ public class TurnController : IOnEventCallback
             intData,
         };
 
-        PhotonNetwork.RaiseEvent((byte)(int)EventType.SincFields, eventContent, options, sendOptions);
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.SyncFields, eventContent, options, sendOptions);
     }
 
 
@@ -106,7 +120,7 @@ public class TurnController : IOnEventCallback
     {
         switch ((EventType)photonEvent.Code)
         {
-            case EventType.Readiness:
+            case EventType.ReadyForRoll:
 
                 if (_playerID != (string)photonEvent.CustomData)
                 {
@@ -114,9 +128,15 @@ public class TurnController : IOnEventCallback
 
                     if (_isReadyForRoll)
                     {
-                        SendStartRollingEvent();
+                        SendStartSynchronizingFieldsEvent();
                     }
                 }
+                break;
+
+            case EventType.StartSync:
+
+                AwaitForSynchronizationFields();
+
                 break;
 
             case EventType.StartRolling:
@@ -141,7 +161,7 @@ public class TurnController : IOnEventCallback
 
                 break;
 
-            case EventType.SincFields:
+            case EventType.SyncFields:
 
                 object[] resultSincData = (object[])photonEvent.CustomData;
 
@@ -158,6 +178,9 @@ public class TurnController : IOnEventCallback
                 }
 
                 break;
+                            
+
+
 
             case EventType.StartBattle:
                 
@@ -175,6 +198,14 @@ public class TurnController : IOnEventCallback
         _playerView.SetPlacementStage(SendReadinessEvent);
     }
    
+    private void AwaitForSynchronizationFields()
+    {
+        var awaitSequence = DOTween.Sequence();
+        awaitSequence.AppendCallback(SinchronizeFields);
+        awaitSequence.AppendInterval(1);
+        awaitSequence.OnComplete(SendStartRollingEvent);
+    }
+
     private void StartRollingStage()
     {        
         _playerView.SetRollStage(RollingSystem);
@@ -184,8 +215,6 @@ public class TurnController : IOnEventCallback
     {
         var awaitSequence = DOTween.Sequence();
         awaitSequence.AppendInterval(2);
-        awaitSequence.AppendCallback(SinchronizeFields);
-        awaitSequence.AppendInterval(1);
         awaitSequence.OnComplete(SendStartBattleEvent);
     }   
 
@@ -221,6 +250,8 @@ public class TurnController : IOnEventCallback
 
     private void SinchronizeFields()
     {
+        _playerView.SetSynchronizationStage();
+
         if (PhotonNetwork.IsMasterClient)
         {
             for (int i = 0; i < _masterCellsLeft.Count; i++)
@@ -231,7 +262,7 @@ public class TurnController : IOnEventCallback
                 }
             }
         }
-        else if (!PhotonNetwork.IsMasterClient)
+        else
         {
             for (int i = 0; i < _opponentCellsLeft.Count; i++)
             {

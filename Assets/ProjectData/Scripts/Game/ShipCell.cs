@@ -2,18 +2,27 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ShipCell : MonoBehaviour
 {
     [SerializeField] private GameObject _hitEffect;
     public bool IsSubscribed { get; private set; }
+    public bool IsDestroyed { get; private set; }
+    public int FieldCellArrayIndex { get; private set; }
 
+    private event Action _damageCheck;
     private FieldCell _fieldSell;
     private LayerMask _layerMask;
 
     private void Awake()
     {
         _layerMask = LayerMask.GetMask("CellsLayer");
+    }
+
+    public void InitDamageCheckCallback(Action damageCheck)
+    {
+        _damageCheck = damageCheck;
     }
 
     public void FindCell()
@@ -25,6 +34,7 @@ public class ShipCell : MonoBehaviour
                 if (!fieldCell.IsShipTarget)
                 {
                     _fieldSell = fieldCell;
+                    FieldCellArrayIndex = fieldCell.Arrayindex;
                 }
             }
         }        
@@ -47,24 +57,28 @@ public class ShipCell : MonoBehaviour
         if (_fieldSell != null)
         {
             _fieldSell.OnCellClick += OnCellClick;
+            //_fieldSell.OnCellClick += damageCheck;
             _fieldSell.SetAsShipTarget(true);
             IsSubscribed = true;
         }        
     }
 
-    public void  UnsubscribeShipSell()
+    public void UnsubscribeShipSell()
     {
         if (_fieldSell != null)
         {
             _fieldSell.OnCellClick -= OnCellClick;
+            //_fieldSell.OnCellClick -= damageCheck;
             _fieldSell.SetAsShipTarget(false);
             _fieldSell = null;
             IsSubscribed = false;
         }       
-    }
+    }    
 
     private void OnCellClick()
     {
         _hitEffect.SetActive(true);
+        IsDestroyed = true;
+        _damageCheck?.Invoke();
     }
 }

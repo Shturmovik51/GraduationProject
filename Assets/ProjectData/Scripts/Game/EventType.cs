@@ -6,9 +6,11 @@ public enum EventType
 {
     None = 0,
     CellClick = 1,
-    Readiness = 2,
+    ReadyForRoll = 2,
     StartRolling = 3,
     SendRollData = 4,
-    SincFields = 5,
-    StartBattle = 6,
+    SyncFields = 5,
+    StartSync = 6,
+    StartBattle = 7,
+    DestroyShip = 8
 }

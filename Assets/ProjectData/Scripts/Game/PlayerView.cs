@@ -63,6 +63,11 @@ public class PlayerView : MonoBehaviour
         _actionButton.interactable = false;
     }
 
+    public void SetSynchronizationStage()
+    {
+        _actionTitleText.text = "Syncronizing Fields";
+    }
+
     public (int value, int index) GetRandomDiceValue()
     {
         var index = Random.Range(0, _rollSystem.Count);

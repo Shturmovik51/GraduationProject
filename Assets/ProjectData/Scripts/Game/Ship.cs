@@ -1,24 +1,35 @@
-using System.Collections;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class Ship : MonoBehaviour
 {
     [SerializeField] private List<Transform> _collisionControllers;
+    [SerializeField] private GameObject _body;
+    [SerializeField] private ShipType _shipType;
 
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
     private Quaternion _droppedRotation;
     private LayerMask _shipsLayer;
+    private LayerMask _cellsLayer;
+    private string _playerID;
+
+    public bool IsDestroyed { get; private set; }
+    public bool IsLocked { get; private set; }
+    public ShipType ShipType => _shipType; 
 
     private void Awake()
     {
         _shipCells = GetComponentsInChildren<ShipCell>().ToList();
+
         _droppedPosition = transform.position;
         _droppedRotation = transform.rotation;
         _shipsLayer = LayerMask.GetMask("ShipsLayer");
+        _cellsLayer = LayerMask.GetMask("CellsLayer");       
     }
 
     public void ClearShipPosition()
@@ -26,6 +37,7 @@ public class Ship : MonoBehaviour
         foreach (var cell in _shipCells)
         {
             cell.UnsubscribeShipSell();
+            cell.InitDamageCheckCallback(CheckForAliveDeck);
         }
     }
 
@@ -68,6 +80,7 @@ public class Ship : MonoBehaviour
             transform.position = new Vector3 (pointTransform.position.x, transform.position.y, pointTransform.position.z);
             _droppedPosition = transform.position;
             _droppedRotation = transform.rotation;
+            //transform.parent = null;
         }
     }
 
@@ -85,4 +98,73 @@ public class Ship : MonoBehaviour
 
         return isHaveCollision;
     }    
+
+    public void CheckForAliveDeck()
+    {
+        var aliveDeck = _shipCells.Find(cell => !cell.IsDestroyed);
+
+        Debug.Log(_shipCells.Find(cell => !cell.IsDestroyed));
+        Debug.Log(aliveDeck);
+
+        if(aliveDeck == null)
+        {
+            SendDestroyShipEvent();
+        }
+
+    }
+
+    public void SetShipIsDestroyed(bool isDestroyed)
+    {
+        IsDestroyed = isDestroyed;        
+    }
+
+    public void SetShipIsLocked(bool isLocked)
+    {
+        IsLocked = isLocked;
+    }
+
+    public void SetExplosionRadius()
+    {
+        _body.SetActive(false);
+
+        foreach (var controller in _collisionControllers)
+        {
+            if (Physics.Raycast(controller.position, -Vector3.up, out var hit, 100, _cellsLayer))
+            {
+                if(hit.collider.TryGetComponent<FieldCell>(out var cell))
+                {
+                    cell.InitAction();
+                    cell.SetUnableToClick(true);
+                }
+            }
+        }
+    }
+
+    public void InitOwner(string ID)
+    {
+        _playerID = ID;
+    }
+
+    public void SendDestroyShipEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+         
+        //float rotationX = transform.rotation.x;
+        //float rotationY = transform.rotation.y;
+        //float rotationZ = transform.rotation.z;
+
+        Quaternion rotation = transform.rotation;
+
+        object[] sendData = new object[]
+        {
+            _playerID,
+            (int)ShipType,
+            _shipCells[0].FieldCellArrayIndex,
+            rotation
+        };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.DestroyShip, sendData, options, sendOptions);
+    }
 }
