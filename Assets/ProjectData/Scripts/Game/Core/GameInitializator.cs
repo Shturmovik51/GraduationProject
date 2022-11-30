@@ -24,13 +24,15 @@ namespace Engine
 
             var playerFieldController = new PlayerFieldController(userInput, playerFieldView);
 
-            var turnController = new TurnController(masterCellsLeft, masterCellsRight, opponentCellsLeft, 
-                    opponentCellsRight, gameData, playerInfo);
-
             var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight);
+
+            var turnController = new TurnController(masterCellsLeft, masterCellsRight, opponentCellsLeft, 
+                    opponentCellsRight, gameData, playerInfo, shipsManager, mouseRaycaster);
+
 
             controllersManager.Add(inputSystemController);
             controllersManager.Add(shipMoveController);
+            controllersManager.Add(turnController);
 
             PhotonNetwork.AddCallbackTarget(turnController);
             PhotonNetwork.AddCallbackTarget(shipsManager);

@@ -1,19 +1,20 @@
 using DG.Tweening;
+using Engine;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
 using System.Collections.Generic;
 
-public class TurnController : IOnEventCallback
+public class TurnController : IOnEventCallback, ICleanable, IController
 {
     private List<FieldCell> _masterCellsLeft;
     private List<FieldCell> _masterCellsRight;
     private List<FieldCell> _opponentCellsLeft;
     private List<FieldCell> _opponentCellsRight;
-    private List<Ship> _masterShips;
-    private List<Ship> _opponentShips;
     private PlayerView _playerView;
+    private ShipsManager _shipsManager;
+    private MouseRaycaster _mouseRaycaster;
     private string _playerName;
     private string _playerID;
     private bool _isReadyForRoll;
@@ -22,7 +23,7 @@ public class TurnController : IOnEventCallback
 
     public TurnController(List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsLeft, List<FieldCell> opponentCellsRight, GameData gameData,
-                LoadedPlayerInfo playerinfo)
+                LoadedPlayerInfo playerinfo, ShipsManager shipsManager, MouseRaycaster mouseRaycaster)
     {
         _masterCellsLeft = masterCellsLeft;
         _masterCellsRight = masterCellsRight;
@@ -30,8 +31,9 @@ public class TurnController : IOnEventCallback
         _opponentCellsRight = opponentCellsRight;
 
         _playerView = gameData.PlayerView;
-        _masterShips = gameData.MasterShips;
-        _opponentShips = gameData.MasterShips;
+
+        _shipsManager = shipsManager;
+        _mouseRaycaster = mouseRaycaster;
 
         if (playerinfo != null)
         {
@@ -39,14 +41,16 @@ public class TurnController : IOnEventCallback
             _playerID = playerinfo.PlayerID;
         }
 
-        StartPlacementStage();
+        _mouseRaycaster.OnMissShoot += SendChangeTurnEvent;
 
+        StartPlacementStage();
     }
 
     private void SendReadinessEvent()
     {
         _isReadyForRoll = true;
         _playerView.SetWaitingForRollStage();
+        _shipsManager.SetAllShipsLocked();
 
         ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
@@ -98,6 +102,7 @@ public class TurnController : IOnEventCallback
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.StartBattle, _playerID, options, sendOptions);
     }
+
     private void SendSincFieldsEvent(int intData)
     {
         _isCompleteRolling = true;
@@ -115,6 +120,14 @@ public class TurnController : IOnEventCallback
         PhotonNetwork.RaiseEvent((byte)(int)EventType.SyncFields, eventContent, options, sendOptions);
     }
 
+    private void SendChangeTurnEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.ChangeTurn, _playerID, options, sendOptions);
+    }
 
     public void OnEvent(EventData photonEvent)
     {
@@ -177,16 +190,28 @@ public class TurnController : IOnEventCallback
                     }
                 }
 
+                break;    
+
+            case EventType.StartBattle:                
+                StartBattleStage(); 
                 break;
-                            
 
+            case EventType.ChangeTurn:
 
+                var playerID = (string)photonEvent.CustomData;
 
-            case EventType.StartBattle:
-                
-                StartBattleStage();                
+                if (_playerID != playerID)
+                {
+                    _mouseRaycaster.SetUnableToHitCell(true);
+                    _playerView.RefreshBattleStageUI(true);
+                }
+                else if(_playerID == playerID)
+                {
+                    _playerView.RefreshBattleStageUI(false);
+                }
 
                 break;
+
 
             default:
                 break;
@@ -276,6 +301,14 @@ public class TurnController : IOnEventCallback
 
     private void StartBattleStage()
     {
-        _playerView.SetBattleStage(_playerView.PlayerRolledValue > _playerView.OpponentRolledValue);
+        var rollResult = _playerView.PlayerRolledValue > _playerView.OpponentRolledValue;
+        _playerView.SetBattleStage(rollResult);
+        _mouseRaycaster.SetUnableToHitCell(rollResult);
+    }
+
+    public void CleanUp()
+    {
+        _mouseRaycaster.OnMissShoot -= SendChangeTurnEvent;
+        _playerView.ClearSubscribes();
     }
 }

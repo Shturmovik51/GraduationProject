@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Engine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ using UnityEngine.InputSystem;
 
 public class ShipMoveController : IUpdatable, IController
 {
+    public event Action<bool> OnChangeShipPosition;
+
     private Camera _camera;
     private Mouse _mouse;
     private Ship _movedShip;
@@ -43,7 +46,13 @@ public class ShipMoveController : IUpdatable, IController
     {
         _movedShip = movedShip;
         _movedShip.ClearShipPosition();
-        _offset = offset;       
+        _movedShip.SetShipIsInPosition(false);
+        _offset = offset;
+
+        if (_movedShip.IsNotInStartPosition)
+        {
+            OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
+        }
     }
 
     public void ClearData()
@@ -51,9 +60,14 @@ public class ShipMoveController : IUpdatable, IController
         if( _movedShip != null)
         {
             DOTween.Kill($"Rotate");
-            _movedShip.SetShipPosition(_isRotating);
+            _movedShip.SetShipPosition(_isRotating);            
             _movedShip = null;
             _isRotating = false;
+
+            if (_movedShip.IsNotInStartPosition)
+            {
+                OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
+            }
         }
     }
 

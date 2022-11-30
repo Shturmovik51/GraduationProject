@@ -16,6 +16,9 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private Image _plyerDiceImage;
     [SerializeField] private Image _opponentDiceImage;
     [SerializeField] private List<DiceValue> _rollSystem;
+    [SerializeField] private TMP_Text _allShipsCounterText;
+
+    private int _shipsCount;
 
     public int PlayerRolledValue { get; private set; }
     public int OpponentRolledValue { get; private set; }
@@ -85,8 +88,36 @@ public class PlayerView : MonoBehaviour
         _actionButton.gameObject.SetActive(true);
         _actionButtonText.text = "Surrender";
         _actionButton.onClick.RemoveAllListeners();
-        //_actionButton.onClick.AddListener();
+        RefreshBattleStageUI(isPlayerTurn);
+    }
+
+    public void RefreshBattleStageUI(bool isPlayerTurn)
+    {
         _actionTitleText.text = isPlayerTurn ? "It's Your Turn" : "Wait, Fear and Pray";
+    }
+
+    public void ClearSubscribes()
+    {
+        _actionButton.onClick.RemoveAllListeners();
+    }
+
+    public void ChangeShipsCount(ChangeCountType type)
+    {
+        switch (type)
+        {            
+            case ChangeCountType.Add:
+                _shipsCount = _shipsCount++;
+                break;
+
+            case ChangeCountType.Remove:
+                _shipsCount = _shipsCount--;
+                break;
+
+            default:
+                break;
+        }
+        
+        _allShipsCounterText.text = _shipsCount.ToString();
     }
 
     private void ShowDices()

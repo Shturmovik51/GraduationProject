@@ -12,5 +12,6 @@ public enum EventType
     SyncFields = 5,
     StartSync = 6,
     StartBattle = 7,
-    DestroyShip = 8
+    DestroyShip = 8,
+    ChangeTurn = 9,
 }

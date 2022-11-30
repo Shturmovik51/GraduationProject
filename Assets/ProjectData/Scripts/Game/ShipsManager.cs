@@ -11,7 +11,13 @@ public class ShipsManager : IOnEventCallback
     private List<FieldCell> _opponentCellsRight;
     private List<Ship> _masterShips;
     private List<Ship> _opponentShips;
+    private List<Ship> _allShips;
+    private PlayerView _playerView;
     private string _playerID;
+
+    public List<Ship> MasterShips => _masterShips;
+    public List<Ship> OpponentShips => _opponentShips;
+
     public ShipsManager(GameData gameData, LoadedPlayerInfo playerinfo, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsRight)
     {
@@ -19,21 +25,26 @@ public class ShipsManager : IOnEventCallback
         _opponentShips = gameData.OpponentShips;
         _masterCellsRight = masterCellsRight;
         _opponentCellsRight = opponentCellsRight;
+        _playerView = gameData.PlayerView;
+
+        _allShips = new List<Ship>();
+        _allShips.AddRange(_masterShips);
+        _allShips.AddRange(_opponentShips);
 
         _playerID = playerinfo.PlayerID;
 
-        foreach (var ship in _masterShips)
+        foreach (var ship in _allShips)
         {
             ship.InitOwner(_playerID);
             PhotonNetwork.AddCallbackTarget(ship);
-            Debug.Log(_playerID);
-        }
+        }        
+    }
 
-        foreach (var ship in _opponentShips)
+    public void SetAllShipsLocked()
+    {
+        foreach (var ship in _allShips)
         {
-            ship.InitOwner(_playerID);
-            PhotonNetwork.AddCallbackTarget(ship);
-            Debug.Log(_playerID);
+            ship.SetShipIsLocked(true);
         }
     }
 

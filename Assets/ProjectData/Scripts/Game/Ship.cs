@@ -1,12 +1,15 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class Ship : MonoBehaviour
 {
+    public event Action<ShipType> OnDestroyShip;
+
     [SerializeField] private List<Transform> _collisionControllers;
     [SerializeField] private GameObject _body;
     [SerializeField] private ShipType _shipType;
@@ -18,8 +21,11 @@ public class Ship : MonoBehaviour
     private LayerMask _cellsLayer;
     private string _playerID;
 
+    public bool IsNotInStartPosition { get; private set; }
     public bool IsDestroyed { get; private set; }
     public bool IsLocked { get; private set; }
+    public bool IsPositioned { get; private set; }
+
     public ShipType ShipType => _shipType; 
 
     private void Awake()
@@ -48,6 +54,8 @@ public class Ship : MonoBehaviour
             ClearShipPosition();
             transform.position = _droppedPosition;
             transform.rotation = _droppedRotation;
+            SetShipIsInPosition(true);
+
             return;
         }
 
@@ -63,6 +71,7 @@ public class Ship : MonoBehaviour
         {
             ClearShipPosition();
             transform.position = _droppedPosition;
+            SetShipIsInPosition(true);
             return;
         }
 
@@ -70,6 +79,7 @@ public class Ship : MonoBehaviour
         {
             ClearShipPosition();
             transform.position = _droppedPosition;
+            SetShipIsInPosition(true);
             return;
         }
 
@@ -80,6 +90,8 @@ public class Ship : MonoBehaviour
             transform.position = new Vector3 (pointTransform.position.x, transform.position.y, pointTransform.position.z);
             _droppedPosition = transform.position;
             _droppedRotation = transform.rotation;
+            IsNotInStartPosition = true;
+            SetShipIsInPosition(true);
             //transform.parent = null;
         }
     }
@@ -109,6 +121,8 @@ public class Ship : MonoBehaviour
         if(aliveDeck == null)
         {
             SendDestroyShipEvent();
+            SetShipIsDestroyed(true);
+            OnDestroyShip?.Invoke(_shipType);
         }
 
     }
@@ -121,6 +135,14 @@ public class Ship : MonoBehaviour
     public void SetShipIsLocked(bool isLocked)
     {
         IsLocked = isLocked;
+    }
+
+    public void SetShipIsInPosition(bool isPositioned)
+    {
+        if (IsNotInStartPosition)
+        {
+            IsPositioned = isPositioned;
+        }
     }
 
     public void SetExplosionRadius()
