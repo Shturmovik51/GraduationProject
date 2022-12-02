@@ -14,4 +14,7 @@ public enum EventType
     StartBattle = 7,
     DestroyShip = 8,
     ChangeTurn = 9,
+    SetShipOnField = 10,
+    EndBattle = 11,
+    OpponentDisconnected = 12,
 }

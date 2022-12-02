@@ -24,7 +24,9 @@ namespace Engine
 
             var playerFieldController = new PlayerFieldController(userInput, playerFieldView);
 
-            var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight);
+            var endBattleController = new EndBattleController(gameData, playerInfo);
+
+            var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight, endBattleController);
 
             var turnController = new TurnController(masterCellsLeft, masterCellsRight, opponentCellsLeft, 
                     opponentCellsRight, gameData, playerInfo, shipsManager, mouseRaycaster);
@@ -36,6 +38,7 @@ namespace Engine
 
             PhotonNetwork.AddCallbackTarget(turnController);
             PhotonNetwork.AddCallbackTarget(shipsManager);
+            PhotonNetwork.AddCallbackTarget(endBattleController);
         }
     }
 }

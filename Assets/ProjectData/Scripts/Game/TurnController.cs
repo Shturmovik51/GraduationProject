@@ -12,7 +12,9 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     private List<FieldCell> _masterCellsRight;
     private List<FieldCell> _opponentCellsLeft;
     private List<FieldCell> _opponentCellsRight;
-    private PlayerView _playerView;
+    private ActionsView _actionsView;
+    private PlayerInfoView _playerInfoView;
+    private PlayerInfoView _opponentInfoView;
     private ShipsManager _shipsManager;
     private MouseRaycaster _mouseRaycaster;
     private string _playerName;
@@ -30,7 +32,10 @@ public class TurnController : IOnEventCallback, ICleanable, IController
         _opponentCellsLeft = opponentCellsLeft;
         _opponentCellsRight = opponentCellsRight;
 
-        _playerView = gameData.PlayerView;
+        _actionsView = gameData.ActionsView;
+
+        _playerInfoView = gameData.PlayerView;
+        _opponentInfoView = gameData.OpponentView;
 
         _shipsManager = shipsManager;
         _mouseRaycaster = mouseRaycaster;
@@ -49,7 +54,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     private void SendReadinessEvent()
     {
         _isReadyForRoll = true;
-        _playerView.SetWaitingForRollStage();
+        _actionsView.SetWaitingForRollStage();
         _shipsManager.SetAllShipsLocked();
 
         ReceiverGroup receiverGroup = ReceiverGroup.All;
@@ -137,7 +142,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
                 if (_playerID != (string)photonEvent.CustomData)
                 {
-                    _playerView.SetOpponentActionText("Ready For Rolling");
+                    _actionsView.SetOpponentActionText("Ready For Rolling");                    
 
                     if (_isReadyForRoll)
                     {
@@ -164,7 +169,8 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
                 if (_playerID != (string)resultSendRollData[0])                    
                 {
-                    _playerView.SetOpponentRollValue((int)resultSendRollData[1]);
+                    _actionsView.SetOpponentRollValue((int)resultSendRollData[1]);
+                    _opponentInfoView.SetInfoTextVisibility(false);
 
                     if (_isCompleteRolling)
                     {
@@ -203,11 +209,11 @@ public class TurnController : IOnEventCallback, ICleanable, IController
                 if (_playerID != playerID)
                 {
                     _mouseRaycaster.SetUnableToHitCell(true);
-                    _playerView.RefreshBattleStageUI(true);
+                    _actionsView.RefreshBattleStageUI(true);
                 }
                 else if(_playerID == playerID)
                 {
-                    _playerView.RefreshBattleStageUI(false);
+                    _actionsView.RefreshBattleStageUI(false);
                 }
 
                 break;
@@ -220,7 +226,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void StartPlacementStage()
     {
-        _playerView.SetPlacementStage(SendReadinessEvent);
+        _actionsView.SetPlacementStage(SendReadinessEvent);
     }
    
     private void AwaitForSynchronizationFields()
@@ -233,7 +239,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void StartRollingStage()
     {        
-        _playerView.SetRollStage(RollingSystem);
+        _actionsView.SetRollStage(RollingSystem);
     }
 
     private void AwaitForBattleStage()
@@ -259,7 +265,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
             roll.AppendInterval(0.2f);
             roll.OnComplete(() =>
             {     
-                var (value, index) = _playerView.GetRandomDiceValue();               
+                var (value, index) = _actionsView.GetRandomDiceValue();               
 
                 if (_isRolling)
                 {
@@ -275,7 +281,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void SinchronizeFields()
     {
-        _playerView.SetSynchronizationStage();
+        _actionsView.SetSynchronizationStage();
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -301,14 +307,15 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void StartBattleStage()
     {
-        var rollResult = _playerView.PlayerRolledValue > _playerView.OpponentRolledValue;
-        _playerView.SetBattleStage(rollResult);
+        var rollResult = _actionsView.PlayerRolledValue > _actionsView.OpponentRolledValue;
+        _actionsView.SetBattleStage(rollResult);
+        _opponentInfoView.SetInfoTextVisibility(true);
         _mouseRaycaster.SetUnableToHitCell(rollResult);
     }
 
     public void CleanUp()
     {
         _mouseRaycaster.OnMissShoot -= SendChangeTurnEvent;
-        _playerView.ClearSubscribes();
+        _actionsView.ClearSubscribes();
     }
 }

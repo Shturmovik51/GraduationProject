@@ -5,20 +5,15 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class PlayerView : MonoBehaviour
+public class ActionsView : MonoBehaviour
 {
     [SerializeField] private TMP_Text _actionTitleText;
     [SerializeField] private TMP_Text _actionButtonText;
-    [SerializeField] private TMP_Text _opponentNameText;
-    [SerializeField] private TMP_Text _opponentInfoText;
     [SerializeField] private TMP_Text _opponentActionText;
     [SerializeField] private Button _actionButton;
     [SerializeField] private Image _plyerDiceImage;
     [SerializeField] private Image _opponentDiceImage;
-    [SerializeField] private List<DiceValue> _rollSystem;
-    [SerializeField] private TMP_Text _allShipsCounterText;
-
-    private int _shipsCount;
+    [SerializeField] private List<DiceValue> _rollSystem;       
 
     public int PlayerRolledValue { get; private set; }
     public int OpponentRolledValue { get; private set; }
@@ -37,7 +32,7 @@ public class PlayerView : MonoBehaviour
     {
         _actionButton.onClick.RemoveAllListeners();
 
-        _actionTitleText.text = "Rolling For Turn";
+        _actionTitleText.text = "Is Rolling For Turn";
         _actionButtonText.text = "Roll The Dice";
 
         _actionButton.interactable = true;
@@ -53,7 +48,6 @@ public class PlayerView : MonoBehaviour
     public void SetOpponentRollValue(int value)
     {
         _opponentActionText.enabled = false;
-        _opponentInfoText.enabled = false;
         _opponentDiceImage.enabled = true;
         var dice = _rollSystem[value];
         _opponentDiceImage.sprite = dice.Sprite;
@@ -84,7 +78,6 @@ public class PlayerView : MonoBehaviour
     {
         _plyerDiceImage.enabled = false;
         _opponentDiceImage.enabled = false;
-        _opponentInfoText.enabled = true;
         _actionButton.gameObject.SetActive(true);
         _actionButtonText.text = "Surrender";
         _actionButton.onClick.RemoveAllListeners();
@@ -99,26 +92,7 @@ public class PlayerView : MonoBehaviour
     public void ClearSubscribes()
     {
         _actionButton.onClick.RemoveAllListeners();
-    }
-
-    public void ChangeShipsCount(ChangeCountType type)
-    {
-        switch (type)
-        {            
-            case ChangeCountType.Add:
-                _shipsCount = _shipsCount++;
-                break;
-
-            case ChangeCountType.Remove:
-                _shipsCount = _shipsCount--;
-                break;
-
-            default:
-                break;
-        }
-        
-        _allShipsCounterText.text = _shipsCount.ToString();
-    }
+    }    
 
     private void ShowDices()
     {

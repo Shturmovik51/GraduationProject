@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 public class ShipMoveController : IUpdatable, IController
 {
-    public event Action<bool> OnChangeShipPosition;
+    //public event Action<bool> OnChangeShipPosition;
 
     private Camera _camera;
     private Mouse _mouse;
@@ -49,10 +49,10 @@ public class ShipMoveController : IUpdatable, IController
         _movedShip.SetShipIsInPosition(false);
         _offset = offset;
 
-        if (_movedShip.IsNotInStartPosition)
-        {
-            OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
-        }
+        //if (_movedShip.IsNotInStartPosition)
+        //{
+        //    OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
+        //}
     }
 
     public void ClearData()
@@ -64,10 +64,10 @@ public class ShipMoveController : IUpdatable, IController
             _movedShip = null;
             _isRotating = false;
 
-            if (_movedShip.IsNotInStartPosition)
-            {
-                OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
-            }
+            //if (_movedShip.IsNotInStartPosition)
+            //{
+            //    OnChangeShipPosition?.Invoke(_movedShip.IsPositioned);
+            //}
         }
     }
 

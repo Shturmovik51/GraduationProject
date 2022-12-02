@@ -11,12 +11,15 @@ public class GameData
     [field: SerializeField] public GameObject OpponentCellsHolderLeft;
     [field: SerializeField] public GameObject OpponentCellsHolderRight;
 
-    [field: SerializeField] public List<Ship> MasterShips;
-    [field: SerializeField] public List<Ship> OpponentShips;
+    [field: SerializeField] public GameObject PlayerShipsHolder;
+    [field: SerializeField] public GameObject OpponentShipsHolder;
 
-    [field: SerializeField] public PlayerView PlayerView;
+    [field: SerializeField] public ActionsView ActionsView;
+    [field: SerializeField] public PlayerInfoView PlayerView;
+    [field: SerializeField] public PlayerInfoView OpponentView;
+    [field: SerializeField] public EndBattleView EndBattleView;
 
-    [field: SerializeField] public Transform MasterTransform;
+    [field: SerializeField] public Transform PlayerTransform;
     [field: SerializeField] public Transform OpponentTransform;
 }
 

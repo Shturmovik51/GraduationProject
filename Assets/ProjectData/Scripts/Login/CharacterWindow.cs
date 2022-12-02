@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System.Linq;
 using TMPro;
+using DG.Tweening;
+using Photon.Realtime;
 
 public class CharacterWindow : MonoBehaviourPunCallbacks
 {
@@ -20,6 +22,8 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
     [SerializeField] private InputField _inputCharacterNameField;
     [SerializeField] private LobbyScreen _lobbiScreen;
 
+    private const string CHARACTER_NAME_KEY = "cn";
+
     private int _selectedViewIndex;
 
     public void OpenCharacterScreen()
@@ -29,11 +33,12 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
         for (int i = 0; i < _characterViews.Count; i++)        
         {
             _characterViews[i].SubscribeAction(SelectCharacterView);
+            _characterViews[i].Button.interactable = false;
         }
 
         _confirmCreatePanelButton.onClick.AddListener(CreateNewCharacter);
         _backCreatePanelButton.onClick.AddListener(() => _creationPanel.SetActive(false));
-        _confirmMainButton.onClick.AddListener(_lobbiScreen.OpenLobbiScreen);
+        _confirmMainButton.onClick.AddListener(StartLobby);
         _confirmMainButton.interactable = false;
 
         GetCharacter();
@@ -57,6 +62,27 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
             {
                 DisplayCharacter(characters[i]);
             }
+
+            var sequence = DOTween.Sequence();
+            sequence.AppendInterval(1);
+            sequence.OnComplete(() =>
+            {
+                foreach (var view in _characterViews)
+                {
+                    if (!view.IsFilled)
+                    {
+                        view.Button.enabled = true;
+                    }
+                }
+            });
+
+        }
+        else
+        {
+            foreach (var view in _characterViews)
+            {
+                view.Button.enabled = true;
+            }
         }
     }
 
@@ -74,6 +100,7 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
             _characterViews[viewID].SetCharacterInfo(characterResult.CharacterName, level, experience);
             _characterViews[viewID].SetFilledState(true);
+            _characterViews[viewID].Button.interactable = true;
         }, OnError);
     }
 
@@ -164,6 +191,23 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
         }, OnError);
     }
+
+    private void StartLobby()
+    {
+        var characterName = _characterViews.Find(view => view.IsSelected).CharacterName;
+
+        PlayFabClientAPI.UpdateUserData(new UpdateUserDataRequest()
+        {
+            Data = new Dictionary<string, string>() 
+            {
+                {CHARACTER_NAME_KEY, characterName},
+            }
+        }, result =>
+        {
+            _lobbiScreen.OpenLobbiScreen();
+
+        }, OnError);
+    } 
 
     private void OnError(PlayFabError error)
     {

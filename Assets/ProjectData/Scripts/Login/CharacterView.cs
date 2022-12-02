@@ -18,6 +18,8 @@ public class CharacterView : MonoBehaviour
 
     public Button Button => _button;
     public bool IsFilled { get; private set; }
+    public bool IsSelected { get; private set; }
+    public string CharacterName { get { return _characterNameText.text; } }
 
     public void SetCharacterInfo(string name, string level, string experience)
     {
@@ -39,6 +41,7 @@ public class CharacterView : MonoBehaviour
     public void SetCharacterIsSelected(bool isSelected)
     { 
         _borderImage.color = isSelected ? Color.green : Color.white;
+        IsSelected = isSelected;
     }
 
     public void SetFilledState(bool isFilled)

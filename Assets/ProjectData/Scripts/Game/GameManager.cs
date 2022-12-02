@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     {     
         if (PhotonNetwork.IsMasterClient)
         {
-            var playerObject = Instantiate(_gameData.UserViewField, _gameData.MasterTransform);
+            var playerObject = Instantiate(_gameData.UserViewField, _gameData.PlayerTransform);
             _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
         }
         else
@@ -66,8 +66,29 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
             _playerInfo.SetPlayerID(result.AccountInfo.PlayFabId);
             _playerInfo.SetPlayerName(result.AccountInfo.Username);
 
+            
+
             //PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
             PhotonNetwork.NickName = result.AccountInfo.Username;
+
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("on", out object userName))
+            {
+                Debug.Log(userName);
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("oid", out object userID))
+            {
+                Debug.Log(userID);
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cn", out object clientName))
+            {
+                Debug.Log(clientName);
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cid", out object clientID))
+            {
+                Debug.Log(clientID);
+            }
+
+
             //PhotonNetwork.AutomaticallySyncScene = true;
             InitCells();
             InitGame();

@@ -1,15 +1,9 @@
 using Photon.Pun;
 using Photon.Realtime;
-using PlayFab.ClientModels;
-using PlayFab;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Unity.VisualScripting;
 
 public class RoomWindow : MonoBehaviourPunCallbacks
 {
@@ -26,6 +20,11 @@ public class RoomWindow : MonoBehaviourPunCallbacks
     [SerializeField] private TMP_Text _visibilityStatusText;
     [SerializeField] private TMP_Text _roomNameText;
     [SerializeField] private TMP_Text _roomOwnerText;
+
+    [SerializeField] private AwaiterWindow _awaiterWindow;
+
+    private const string CLIENT_NAME_KEY = "cn";
+    private const string CLIENT_ID_KEY = "cid";
 
     //private Room _room;
     private Dictionary<Player, TextMeshProUGUI> _players;
@@ -80,12 +79,16 @@ public class RoomWindow : MonoBehaviourPunCallbacks
         textComponent.text = newPlayer.NickName;
 
         _players.Add(newPlayer, textComponent);
+
+        PhotonNetwork.CurrentRoom.CustomProperties.Add(CLIENT_NAME_KEY, newPlayer.NickName);
+        PhotonNetwork.CurrentRoom.CustomProperties.Add(CLIENT_ID_KEY, newPlayer.UserId);
+
+        _awaiterWindow.SetOpponentDetectionState();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         base.OnPlayerLeftRoom(otherPlayer);
-
     }
 
     public override void OnCreatedRoom()
@@ -108,6 +111,13 @@ public class RoomWindow : MonoBehaviourPunCallbacks
             _changeAccessStateButton.interactable = false;
             _changeVisibilityStateButton.interactable = false;
             _StartGameButton.interactable = false;
+
+            var textObject = new GameObject("UserName");
+            textObject.transform.SetParent(_scrollViewContent);
+            var textComponent = textObject.AddComponent<TextMeshProUGUI>();
+            textComponent.text = PhotonNetwork.LocalPlayer.NickName;
+
+            _awaiterWindow.SetOpponentDetectionState();
         }
 
         InitRoom();
@@ -134,6 +144,9 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private void StartGame()
     {
+
+
+
         PhotonNetwork.LoadLevel(1);
     }    
 }

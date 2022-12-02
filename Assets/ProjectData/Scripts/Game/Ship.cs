@@ -9,6 +9,7 @@ using UnityEngine;
 public class Ship : MonoBehaviour
 {
     public event Action<ShipType> OnDestroyShip;
+    public event Action<bool> OnSetShipOnField;
 
     [SerializeField] private List<Transform> _collisionControllers;
     [SerializeField] private GameObject _body;
@@ -142,6 +143,8 @@ public class Ship : MonoBehaviour
         if (IsNotInStartPosition)
         {
             IsPositioned = isPositioned;
+            SendSetShipOnFieldEvent(isPositioned);
+            OnSetShipOnField?.Invoke(isPositioned);
         }
     }
 
@@ -171,11 +174,7 @@ public class Ship : MonoBehaviour
     {
         ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
-        SendOptions sendOptions = new SendOptions { Reliability = true };
-         
-        //float rotationX = transform.rotation.x;
-        //float rotationY = transform.rotation.y;
-        //float rotationZ = transform.rotation.z;
+        SendOptions sendOptions = new SendOptions { Reliability = true };        
 
         Quaternion rotation = transform.rotation;
 
@@ -188,5 +187,20 @@ public class Ship : MonoBehaviour
         };
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.DestroyShip, sendData, options, sendOptions);
+    }
+
+    public void SendSetShipOnFieldEvent(bool isSet)
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        object[] sendData = new object[]
+        {
+            _playerID,
+            isSet
+        };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.SetShipOnField, sendData, options, sendOptions);
     }
 }
