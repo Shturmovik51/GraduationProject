@@ -8,6 +8,8 @@ namespace Utils
 {
     public class AnimatedButton : Button
     {
+        //[SerializeField] private float _animationScaleModifier = 1.1f;
+
         public event Action OnPointerEnterEvent;
 
         private Sequence _showSequence;
@@ -40,7 +42,7 @@ namespace Utils
             DOTween.Kill($"ScaleDown {_nameID}");
             _showSequence = DOTween.Sequence();
             _showSequence.SetId($"ScaleUp {_nameID}");
-            _showSequence.Append(gameObject.transform.DOScale(1.2f, 0.2f));
+            _showSequence.Append(gameObject.transform.DOScale(1.1f, 0.2f));
         }
 
         public override void OnPointerExit(PointerEventData eventData)

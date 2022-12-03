@@ -14,7 +14,9 @@ namespace Engine
             List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, List<FieldCell> opponentCellsLeft,
                 List<FieldCell> opponentCellsRight, LoadedPlayerInfo playerInfo, GameData gameData)
         {
-
+            var sounrManager = Object.FindObjectOfType<SoundManager>();
+            sounrManager.SubscribeGameButtons();
+            sounrManager.PlayGameMainTheme();
 
             var inputSystemController = new InputSystemController();
             var userInput = inputSystemController.GetInputSystem();

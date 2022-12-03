@@ -13,10 +13,15 @@ public class EnterInGameWindow : MonoBehaviour
     [SerializeField] private Canvas _signInCanvas;
     [SerializeField] private AwaiterWindow _awaiterWindow;
 
+    private SoundManager _soundManager;
+
     private void Start()
     {
         _signInButton.onClick.AddListener(OpenSignInWindow);
         _createAcciuntButton.onClick.AddListener(OpenCreateAccountWindow);
+        _soundManager = FindObjectOfType<SoundManager>();
+        _soundManager.SubscribeMenuButtons();
+        _soundManager.PlayMenuSound();
     }
 
     private void OpenSignInWindow()

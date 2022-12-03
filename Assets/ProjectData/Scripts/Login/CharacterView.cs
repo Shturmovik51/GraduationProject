@@ -48,4 +48,10 @@ public class CharacterView : MonoBehaviour
     {
         IsFilled = isFilled;
     }
+
+    public void SetCharacterSprite(Sprite sprite)
+    {
+        _characterImage.sprite = sprite;
+        _characterImage.enabled = true;
+    }   
 }

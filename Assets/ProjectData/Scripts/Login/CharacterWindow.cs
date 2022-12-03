@@ -9,11 +9,12 @@ using System.Linq;
 using TMPro;
 using DG.Tweening;
 using Photon.Realtime;
+using Unity.VisualScripting;
+using WebSocketSharp;
 
 public class CharacterWindow : MonoBehaviourPunCallbacks
 {
     [SerializeField] private Canvas _characterScreenCanvas;
-    [SerializeField] private List<CharacterView> _characterViews;
     [SerializeField] private Button _confirmMainButton;
     [SerializeField] private Button _backMainButton;
     [SerializeField] private Button _confirmCreatePanelButton;
@@ -21,10 +22,27 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject _creationPanel;
     [SerializeField] private InputField _inputCharacterNameField;
     [SerializeField] private LobbyScreen _lobbiScreen;
+    [SerializeField] private AvatarsConfig _avatarsConfig;
+    [SerializeField] private GameObject _avatarsHolder;
+    [SerializeField] private List<CharacterView> _characterViews;
 
     private const string CHARACTER_NAME_KEY = "cn";
-
+    private List<AvatarView> _avatars;
+    private bool _isAvatarSelected;
+    private int _selectedAvatarID;
     private int _selectedViewIndex;
+
+    private void Awake()
+    {
+        _avatars = _avatarsHolder.GetComponentsInChildren<AvatarView>().ToList();
+
+        for (int i = 0; i < _avatars.Count; i++)
+        {
+            _avatars[i].Init(_avatarsConfig.GetAvatarByIndex(i), i);
+            _avatars[i].SubscribeButton(SelectAvatar);
+            //_avatars[i].Button.onClick.AddListener(() => SelectAvatar(_avatars[i]));
+        }
+    }
 
     public void OpenCharacterScreen()
     {
@@ -56,7 +74,7 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
     private void ShowCharactersInfo(List<CharacterResult> characters)
     {        
-        if (characters.Count > 0)         // todo переделать условие
+        if (characters.Count > 0)         
         {
             for (int i = 0; i < characters.Count; i++)            
             {
@@ -71,7 +89,7 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
                 {
                     if (!view.IsFilled)
                     {
-                        view.Button.enabled = true;
+                        view.Button.interactable = true;
                     }
                 }
             });
@@ -81,7 +99,8 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
         {
             foreach (var view in _characterViews)
             {
-                view.Button.enabled = true;
+                view.Button.interactable = true;
+                Debug.Log("Da");
             }
         }
     }
@@ -97,10 +116,13 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
             var level = result.CharacterStatistics["LVL"].ToString();
             var experience = result.CharacterStatistics["EXP"].ToString();
             var viewID = result.CharacterStatistics["ViewID"];
+            var sprite = _avatarsConfig.GetAvatarByIndex(result.CharacterStatistics["AvatarID"]);
 
             _characterViews[viewID].SetCharacterInfo(characterResult.CharacterName, level, experience);
             _characterViews[viewID].SetFilledState(true);
             _characterViews[viewID].Button.interactable = true;
+            _characterViews[viewID].SetCharacterSprite(sprite);
+
         }, OnError);
     }
 
@@ -126,6 +148,11 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
     private void CreateNewCharacter()
     {
+        if(_inputCharacterNameField.text.IsNullOrEmpty() || !_isAvatarSelected) 
+        { 
+            return; 
+        }
+
         PlayFabClientAPI.GetStoreItems(new GetStoreItemsRequest
         {
             CatalogVersion = "FirstCatalog",
@@ -172,6 +199,7 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
             {
                 {"LVL", 1 },
                 {"EXP", 0 },
+                {"AvatarID", _selectedAvatarID },
                 {"ViewID", _selectedViewIndex }
             }
         }, result =>
@@ -208,6 +236,21 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
         }, OnError);
     } 
+
+    private void SelectAvatar(AvatarView avatarView)
+    {
+        foreach (var avatar in _avatars)
+        {
+            avatar.ResetSelection();
+            _isAvatarSelected = false;
+        }
+
+        avatarView.SetSelection();
+        _selectedAvatarID = avatarView.Index;
+        _isAvatarSelected = true;
+
+        Debug.Log(_selectedAvatarID);
+    }
 
     private void OnError(PlayFabError error)
     {

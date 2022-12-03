@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     }  
 
     private void Start()
-    {    
+    {   
         _masterCellsLeft = _gameData.MasterCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
         _masterCellsRight = _gameData.MasterCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
         _opponentCellsLeft = _gameData.OpponentCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
