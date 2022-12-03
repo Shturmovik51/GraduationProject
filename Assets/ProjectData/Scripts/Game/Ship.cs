@@ -14,7 +14,8 @@ public class Ship : MonoBehaviour
     [SerializeField] private List<Transform> _collisionControllers;
     [SerializeField] private GameObject _body;
     [SerializeField] private ShipType _shipType;
-
+    [SerializeField] private AudioSource _shipSetInPositionAudioSource;
+ 
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
     private Quaternion _droppedRotation;
@@ -145,6 +146,7 @@ public class Ship : MonoBehaviour
             IsPositioned = isPositioned;
             SendSetShipOnFieldEvent(isPositioned);
             OnSetShipOnField?.Invoke(isPositioned);
+            _shipSetInPositionAudioSource.Play();
         }
     }
 

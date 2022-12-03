@@ -18,6 +18,8 @@ public class FieldCell : MonoBehaviour
     [SerializeField] private GameObject _missMarker;
     [SerializeField] private GameObject _hitMarker;
     [SerializeField] private Transform _pointedBodyTransform;
+    [SerializeField] private AudioSource _missClickAudioSource;
+    [SerializeField] private AudioSource _hitAudioSource;
 
     private Sequence _pointerEnterSequence;
     private Sequence _pointerExitSequence;
@@ -64,10 +66,12 @@ public class FieldCell : MonoBehaviour
             if (!IsShipTarget)
             {
                 _missMarker.SetActive(true);
+                _missClickAudioSource.Play();
             }
             else
             {
                 _hitMarker.SetActive(true);
+                _hitAudioSource.Play();
             }
         }
         else if(!IsBattleFieldCell)
@@ -75,6 +79,7 @@ public class FieldCell : MonoBehaviour
             if (!IsShipTarget)
             {
                 _missMarker.SetActive(true);
+                _missClickAudioSource.Play();
             }            
         }
     }
