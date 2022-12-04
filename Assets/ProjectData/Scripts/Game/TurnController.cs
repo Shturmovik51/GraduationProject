@@ -307,7 +307,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void StartBattleStage()
     {
-        var rollResult = _actionsView.PlayerRolledValue > _actionsView.OpponentRolledValue;
+        var rollResult = _actionsView.PlayerRolledValue > _actionsView.OpponentRolledValue;             //todo need rerol
         _actionsView.SetBattleStage(rollResult);
         _opponentInfoView.SetInfoTextVisibility(true);
         _mouseRaycaster.SetUnableToHitCell(rollResult);

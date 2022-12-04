@@ -18,4 +18,6 @@ public enum EventType
     EndBattle = 11,
     OpponentDisconnected = 12,
     CharacterInfo = 13,
+    YesOrNo = 14,
+    LeaveTheGame = 15,
 }

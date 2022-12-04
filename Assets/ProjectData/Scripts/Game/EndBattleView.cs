@@ -32,6 +32,11 @@ public class EndBattleView : MonoBehaviour
     [SerializeField] private Button _exitButton;
     [SerializeField] private Button _restartButton;
 
+    public Button PlayerYesButton => _playerYesButton;
+    public Button PlayerNoButton => _playerNoButton;
+    public Button ExitButton => _exitButton;
+    public Button RestartButton => _restartButton;
+
     public void SetLoseScreen()
     {
         _loseImage.enabled = true;
@@ -46,7 +51,53 @@ public class EndBattleView : MonoBehaviour
         _victoryTitleText.enabled = true;
         _victoryPraiseText.enabled = true;
         _revardTitleText.enabled = true;
+        _revardText.text = "Experiense + 100";
         _revardText.enabled = true;
         _screenCanvas.enabled = true;
+    }
+
+    public void SetPlayeVoteResult(VoteType voteType)
+    {
+        switch (voteType)
+        {
+            case VoteType.None:
+                break;
+            case VoteType.Yes:
+                _playerNoButtonImage.enabled = false;
+                _playerYesButtonImage.enabled = true;
+                break;
+            case VoteType.No:
+                _playerNoButtonImage.enabled = true;
+                _playerYesButtonImage.enabled = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SetOpponentVoteResult(VoteType voteType)
+    {
+
+        switch (voteType)
+        {
+            case VoteType.None:
+                break;
+            case VoteType.Yes:
+                _opponentNoButtonImage.enabled = false;
+                _opponentYesButtonImage.enabled = true;
+                break;
+            case VoteType.No:
+                _opponentNoButtonImage.enabled = true;
+                _opponentYesButtonImage.enabled = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SetOpponentLeftGameState()
+    {
+        _playAgainPanel.gameObject.SetActive(false);
+        _opponentDisconnectPanel.gameObject.SetActive(true);
     }
 }

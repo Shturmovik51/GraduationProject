@@ -90,8 +90,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if (PhotonNetwork.IsConnected)
         {      
             PhotonNetwork.NickName = _playersInfo.PlayerName;
+            PhotonNetwork.AutomaticallySyncScene = true;
             //PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
-            //PhotonNetwork.AutomaticallySyncScene = true;  
 
             GetUserData(_playersInfo.PlayerID);
         }
@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
                                 
                 var sprite = _gameData.AvatarsConfig.GetAvatarByIndex(spriteIndex);
                 
-                _playersInfo.SetPlayerCharacterInfo(characterName, level, experience, sprite);
+                _playersInfo.SetPlayerCharacterInfo(characterName, level, experience, sprite, characterID);
                 _gameData.PlayerView.InitInfoView(characterName, level, experience);
 
                 SendCharacterInfoEvent(level, experience, spriteIndex, characterName);

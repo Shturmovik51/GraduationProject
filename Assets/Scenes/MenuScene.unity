@@ -2170,6 +2170,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5196299660825227183, guid: 1ce40935950242148976f8965d44a631, type: 3}
+      propertyPath: _lobbyScreen
+      value: 
+      objectReference: {fileID: 1321479137}
+    - target: {fileID: 5196299660825227183, guid: 1ce40935950242148976f8965d44a631, type: 3}
       propertyPath: _signInCanvas
       value: 
       objectReference: {fileID: 7263193345096517702}
@@ -2586,7 +2590,7 @@ PrefabInstance:
       objectReference: {fileID: 1045335547}
     - target: {fileID: 8721362770526239701, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00013675346
+      value: 0.00060537795
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 107d8bcc31615ee469d22a48556e9db9, type: 3}

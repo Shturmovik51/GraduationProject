@@ -37,6 +37,7 @@ namespace Engine
             controllersManager.Add(inputSystemController);
             controllersManager.Add(shipMoveController);
             controllersManager.Add(turnController);
+            controllersManager.Add(endBattleController);
 
             PhotonNetwork.AddCallbackTarget(turnController);
             PhotonNetwork.AddCallbackTarget(shipsManager);

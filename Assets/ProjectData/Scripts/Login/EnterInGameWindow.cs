@@ -12,6 +12,7 @@ public class EnterInGameWindow : MonoBehaviour
     [SerializeField] private Canvas _createAccountCanvas;
     [SerializeField] private Canvas _signInCanvas;
     [SerializeField] private AwaiterWindow _awaiterWindow;
+    [SerializeField] private LobbyScreen _lobbyScreen;
 
     private SoundManager _soundManager;
 
@@ -22,6 +23,20 @@ public class EnterInGameWindow : MonoBehaviour
         _soundManager = FindObjectOfType<SoundManager>();
         _soundManager.SubscribeMenuButtons();
         _soundManager.PlayMenuSound();
+
+        if (PlayerPrefs.HasKey("LoggedIn"))
+        {
+            if (PlayerPrefs.GetInt("LoggedIn") == 1)
+            {
+                PlayerPrefs.SetInt("LoggedIn", 0);
+                _lobbyScreen.OpenLobbiScreen();
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("LoggedIn", 0);
+        }
+
     }
 
     private void OpenSignInWindow()
