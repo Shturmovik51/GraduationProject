@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class CharacterView : MonoBehaviour
@@ -20,6 +21,7 @@ public class CharacterView : MonoBehaviour
     public bool IsFilled { get; private set; }
     public bool IsSelected { get; private set; }
     public string CharacterName { get { return _characterNameText.text; } }
+    public string CharacterID { get; private set; }
 
     public void SetCharacterInfo(string name, string level, string experience)
     {
@@ -31,6 +33,11 @@ public class CharacterView : MonoBehaviour
         _characterNameText.enabled = true;
         _characterLevelText.enabled = true;
         _characterExperienceText.enabled = true;
+    }
+
+    public void SetCharacterID(string id)
+    {
+        CharacterID = id;
     }
 
     public void SubscribeAction(UnityAction<CharacterView> action)

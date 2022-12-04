@@ -4458,6 +4458,7 @@ MonoBehaviour:
     PlayerView: {fileID: 1411863016}
     OpponentView: {fileID: 1419955148}
     EndBattleView: {fileID: 919274783}
+    AvatarsConfig: {fileID: 11400000, guid: 5a89e53b9c58d5b4b9137a29a6239b67, type: 2}
     PlayerTransform: {fileID: 1932446385}
     OpponentTransform: {fileID: 1191950002}
 --- !u!1001 &283642053

@@ -50,8 +50,11 @@ public class PlayerInfoView : MonoBehaviour
 
             default:
                 break;
-        }
-
-        Debug.Log(ShipsCount);
+        }  
+    }
+    public void InitInfoView(string charName, int level, int experience)
+    {
+        _playerTitleText.text = charName;
+        _playerInfoText.text = $"Level: {level} | Experience: {experience}";
     }
 }

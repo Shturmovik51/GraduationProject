@@ -11,7 +11,7 @@ public class EndBattleController : IOnEventCallback
     private PlayerInfoView _playerInfoView;
     private string _playerID;
 
-    public EndBattleController(GameData gameData, LoadedPlayerInfo playerInfo)
+    public EndBattleController(GameData gameData, LoadedPlayersInfo playerInfo)
     {
         _endBattleView = gameData.EndBattleView;
         _playerInfoView = gameData.PlayerView;

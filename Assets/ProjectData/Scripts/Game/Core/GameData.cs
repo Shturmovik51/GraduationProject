@@ -18,8 +18,10 @@ public class GameData
     [field: SerializeField] public PlayerInfoView PlayerView;
     [field: SerializeField] public PlayerInfoView OpponentView;
     [field: SerializeField] public EndBattleView EndBattleView;
+    [field: SerializeField] public AvatarsConfig AvatarsConfig;
 
     [field: SerializeField] public Transform PlayerTransform;
     [field: SerializeField] public Transform OpponentTransform;
+
 }
 

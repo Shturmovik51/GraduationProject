@@ -25,7 +25,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     public TurnController(List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsLeft, List<FieldCell> opponentCellsRight, GameData gameData,
-                LoadedPlayerInfo playerinfo, ShipsManager shipsManager, MouseRaycaster mouseRaycaster)
+                LoadedPlayersInfo playerinfo, ShipsManager shipsManager, MouseRaycaster mouseRaycaster)
     {
         _masterCellsLeft = masterCellsLeft;
         _masterCellsRight = masterCellsRight;

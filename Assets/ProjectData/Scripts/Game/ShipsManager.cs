@@ -24,7 +24,7 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
     public List<Ship> PlayerShips => _playerShips;
     public List<Ship> OpponentShips => _opponentShips;
 
-    public ShipsManager(GameData gameData, LoadedPlayerInfo playerinfo, List<FieldCell> masterCellsRight, 
+    public ShipsManager(GameData gameData, LoadedPlayersInfo playerinfo, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsRight, EndBattleController endBattleController)
     {
         _playerShips = gameData.PlayerShipsHolder.GetComponentsInChildren<Ship>().ToList();

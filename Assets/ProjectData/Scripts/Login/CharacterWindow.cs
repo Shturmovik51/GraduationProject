@@ -11,6 +11,7 @@ using DG.Tweening;
 using Photon.Realtime;
 using Unity.VisualScripting;
 using WebSocketSharp;
+using UnityEngine.TextCore.Text;
 
 public class CharacterWindow : MonoBehaviourPunCallbacks
 {
@@ -26,7 +27,8 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject _avatarsHolder;
     [SerializeField] private List<CharacterView> _characterViews;
 
-    private const string CHARACTER_NAME_KEY = "cn";
+    private const string CHARACTER_NAME_KEY = "chn";
+    private const string CHARACTER_ID_KEY = "chid";
     private List<AvatarView> _avatars;
     private bool _isAvatarSelected;
     private int _selectedAvatarID;
@@ -117,11 +119,12 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
             var experience = result.CharacterStatistics["EXP"].ToString();
             var viewID = result.CharacterStatistics["ViewID"];
             var sprite = _avatarsConfig.GetAvatarByIndex(result.CharacterStatistics["AvatarID"]);
-
+            
             _characterViews[viewID].SetCharacterInfo(characterResult.CharacterName, level, experience);
             _characterViews[viewID].SetFilledState(true);
             _characterViews[viewID].Button.interactable = true;
             _characterViews[viewID].SetCharacterSprite(sprite);
+            _characterViews[viewID].SetCharacterID(characterResult.CharacterId);
 
         }, OnError);
     }
@@ -200,7 +203,7 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
                 {"LVL", 1 },
                 {"EXP", 0 },
                 {"AvatarID", _selectedAvatarID },
-                {"ViewID", _selectedViewIndex }
+                {"ViewID", _selectedViewIndex },                
             }
         }, result =>
         {
@@ -222,14 +225,18 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
 
     private void StartLobby()
     {
-        var characterName = _characterViews.Find(view => view.IsSelected).CharacterName;
+        var character = _characterViews.Find(view => view.IsSelected);
 
         PlayFabClientAPI.UpdateUserData(new UpdateUserDataRequest()
         {
-            Data = new Dictionary<string, string>() 
+            Data = new Dictionary<string, string>()
             {
-                {CHARACTER_NAME_KEY, characterName},
-            }
+                {CHARACTER_NAME_KEY, character.CharacterName},
+                {CHARACTER_ID_KEY,  character.CharacterID}
+            },
+
+            Permission = UserDataPermission.Public
+
         }, result =>
         {
             _lobbiScreen.OpenLobbiScreen();

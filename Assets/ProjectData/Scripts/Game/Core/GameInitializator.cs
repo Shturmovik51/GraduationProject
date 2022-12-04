@@ -12,7 +12,7 @@ namespace Engine
     {
         public GameInitializator(ControllersManager controllersManager, PlayerFieldView playerFieldView,
             List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, List<FieldCell> opponentCellsLeft,
-                List<FieldCell> opponentCellsRight, LoadedPlayerInfo playerInfo, GameData gameData)
+                List<FieldCell> opponentCellsRight, LoadedPlayersInfo playerInfo, GameData gameData)
         {
             var sounrManager = Object.FindObjectOfType<SoundManager>();
             sounrManager.SubscribeGameButtons();

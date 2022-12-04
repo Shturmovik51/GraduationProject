@@ -17,4 +17,5 @@ public enum EventType
     SetShipOnField = 10,
     EndBattle = 11,
     OpponentDisconnected = 12,
+    CharacterInfo = 13,
 }

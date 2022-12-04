@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Engine;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -6,11 +7,14 @@ using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.Public;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCallback
+public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {   
     [SerializeField] private GameData _gameData;
 
@@ -22,22 +26,58 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
     private ControllersManager _controllersManager;
     private PlayerFieldView _playerFieldView;
 
-    private LoadedPlayerInfo _playerInfo;
+    private LoadedPlayersInfo _playersInfo;
 
     private bool _isInitialised;
 
     private void Awake()
-    {     
+    {
+        _playersInfo = new LoadedPlayersInfo();
+
         if (PhotonNetwork.IsMasterClient)
         {
             var playerObject = Instantiate(_gameData.UserViewField, _gameData.PlayerTransform);
             _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
+
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("on", out object userName))
+            {
+                _playersInfo.SetPlayerName(userName.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("oid", out object userID))
+            {
+                _playersInfo.SetPlayerID(userID.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cn", out object clientName))
+            {
+                _playersInfo.SetOpponentName(clientName.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cid", out object clientID))
+            {
+                _playersInfo.SetOpponentID(clientID.ToString());
+            }
         }
         else
         {
             var playerObject = Instantiate(_gameData.UserViewField, _gameData.OpponentTransform);
             _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
-        }
+
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("on", out object userName))
+            {
+                _playersInfo.SetOpponentName(userName.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("oid", out object userID))
+            {
+                _playersInfo.SetOpponentID(userID.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cn", out object clientName))
+            {
+                _playersInfo.SetPlayerName(clientName.ToString());
+            }
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cid", out object clientID))
+            {
+                _playersInfo.SetPlayerID(clientID.ToString());
+            }
+        }        
     }  
 
     private void Start()
@@ -46,66 +86,88 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
         _masterCellsRight = _gameData.MasterCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
         _opponentCellsLeft = _gameData.OpponentCellsHolderLeft.GetComponentsInChildren<FieldCell>().ToList();
         _opponentCellsRight = _gameData.OpponentCellsHolderRight.GetComponentsInChildren<FieldCell>().ToList();
-           
 
         if (PhotonNetwork.IsConnected)
-        {
-            PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { }, OnGetInfo, OnError);
+        {      
+            PhotonNetwork.NickName = _playersInfo.PlayerName;
+            //PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
+            //PhotonNetwork.AutomaticallySyncScene = true;  
+
+            GetUserData(_playersInfo.PlayerID);
         }
         else
         {
             InitCells();
             InitGame();
             _isInitialised = true;
-        }
+        }    
+    }
 
-        void OnGetInfo(GetAccountInfoResult result)
+    private void GetUserData(string myPlayFabId)
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest()
         {
-            _playerInfo = new LoadedPlayerInfo();
-
-            _playerInfo.SetPlayerID(result.AccountInfo.PlayFabId);
-            _playerInfo.SetPlayerName(result.AccountInfo.Username);
-
-            
-
-            //PhotonNetwork.AuthValues = new AuthenticationValues(UserID);
-            PhotonNetwork.NickName = result.AccountInfo.Username;
-
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("on", out object userName))
-            {
-                Debug.Log(userName);
-            }
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("oid", out object userID))
-            {
-                Debug.Log(userID);
-            }
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cn", out object clientName))
-            {
-                Debug.Log(clientName);
-            }
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("cid", out object clientID))
-            {
-                Debug.Log(clientID);
-            }
-
-
-            //PhotonNetwork.AutomaticallySyncScene = true;
-            InitCells();
-            InitGame();
-            _isInitialised = true;
-        }
-
-        void OnError(PlayFabError error)
+            PlayFabId = myPlayFabId
+        }, result => 
         {
+            Debug.Log(myPlayFabId);
+
+            var characterID =  result.Data["chid"].Value;
+            var characterName = result.Data["chn"].Value;            
+
+            PlayFabClientAPI.GetCharacterStatistics(new GetCharacterStatisticsRequest()
+            {
+                CharacterId = characterID
+            }, OnGetCharactersSuccess, OnError);
+
+            void OnGetCharactersSuccess(GetCharacterStatisticsResult result)
+            {
+                var level = 0;
+                var experience = 0;
+                var spriteIndex = 0;
+
+                if (int.TryParse(result.CharacterStatistics["LVL"].ToString(), out var lvlResult))
+                {
+                    level = lvlResult;
+                }
+                if (int.TryParse(result.CharacterStatistics["EXP"].ToString(), out var expResult))
+                {
+                    experience = expResult;
+                }
+                if (int.TryParse(result.CharacterStatistics["AvatarID"].ToString(), out var indexResult))
+                {
+                    spriteIndex = indexResult;
+                }
+                                
+                var sprite = _gameData.AvatarsConfig.GetAvatarByIndex(spriteIndex);
+                
+                _playersInfo.SetPlayerCharacterInfo(characterName, level, experience, sprite);
+                _gameData.PlayerView.InitInfoView(characterName, level, experience);
+
+                SendCharacterInfoEvent(level, experience, spriteIndex, characterName);
+
+                StartInitialization();   
+            }
+        }, error => 
+        {
+            Debug.Log("Got error retrieving user data:");
             Debug.Log(error.GenerateErrorReport());
-        }
-    }   
+        });
+    }    
+
+    private void StartInitialization()
+    {       
+        InitCells();
+        InitGame();
+        _isInitialised = true;        
+    }
+
 
     private void InitGame()
     {
         _controllersManager = new ControllersManager();
         new GameInitializator(_controllersManager, _playerFieldView, _masterCellsLeft, _masterCellsRight,
-                _opponentCellsLeft, _opponentCellsRight, _playerInfo, _gameData);
+                _opponentCellsLeft, _opponentCellsRight, _playersInfo, _gameData);
 
         _controllersManager.Initialization();
     }
@@ -154,10 +216,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
             return;
         for (int i = 0; i < _masterCellsLeft.Count; i++)
         {
-            _masterCellsLeft[i].InitCell(i, _playerInfo.PlayerID);
-            _masterCellsRight[i].InitCell(i, _playerInfo.PlayerID);
-            _opponentCellsLeft[i].InitCell(i, _playerInfo.PlayerID);
-            _opponentCellsRight[i].InitCell(i, _playerInfo.PlayerID);
+            _masterCellsLeft[i].InitCell(i, _playersInfo.PlayerID);
+            _masterCellsRight[i].InitCell(i, _playersInfo.PlayerID);
+            _opponentCellsLeft[i].InitCell(i, _playersInfo.PlayerID);
+            _opponentCellsRight[i].InitCell(i, _playersInfo.PlayerID);
 
             PhotonNetwork.AddCallbackTarget(_masterCellsLeft[i]);
             PhotonNetwork.AddCallbackTarget(_masterCellsRight[i]);
@@ -172,37 +234,74 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IOnEventCa
         {
             case EventType.CellClick:
 
-                object[] result = (object[])photonEvent.CustomData;
+                object[] cellClickResult = (object[])photonEvent.CustomData;
 
-                if (_playerInfo.PlayerID != (string)result[1])
+                if (_playersInfo.PlayerID != (string)cellClickResult[1])
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        _masterCellsLeft[(int)result[0]].InitAction();
+                        _masterCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                     else if(!PhotonNetwork.IsMasterClient)
                     {
-                        _opponentCellsLeft[(int)result[0]].InitAction();
+                        _opponentCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                 }
-                else if(_playerInfo.PlayerID == (string)result[1])
+                else if(_playersInfo.PlayerID == (string)cellClickResult[1])
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        _opponentCellsLeft[(int)result[0]].InitAction();
+                        _opponentCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                     else if (!PhotonNetwork.IsMasterClient)
                     {
-                        _masterCellsLeft[(int)result[0]].InitAction();
+                        _masterCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                 }
+                break;
+
+            case EventType.CharacterInfo:
+
+                object[] characterInfoResult = (object[])photonEvent.CustomData;
+
+                if(_playersInfo.PlayerID != (string)characterInfoResult[4])
+                {
+                    var level = (int)characterInfoResult[0];
+                    var experience = (int)characterInfoResult[1];               
+                    var spriteIndex = (int)characterInfoResult[2];
+                    var characterName = (string)characterInfoResult[3];
+
+                    var sprite = _gameData.AvatarsConfig.GetAvatarByIndex(spriteIndex);
+
+                    _playersInfo.SetOpponentCharacterInfo(characterName, level, experience, sprite);
+                    _gameData.OpponentView.InitInfoView(characterName, level, experience);
+                }
+
                 break;
         }
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    private void OnError(PlayFabError error)
     {
-
+        var errorMessage = error.GenerateErrorReport();
+        Debug.Log(errorMessage);
     }
 
+    public void SendCharacterInfoEvent(int level, int experience, int spriteIndex, string characterName)
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        object[] sendData = new object[]
+        {
+            level,
+            experience,
+            spriteIndex,
+            characterName,
+            _playersInfo.PlayerID
+        };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.CharacterInfo, sendData, options, sendOptions);
+    }
 }
