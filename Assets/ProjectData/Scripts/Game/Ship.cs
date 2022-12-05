@@ -245,11 +245,11 @@ public class Ship : MonoBehaviour
             {
                 if (rigidBody != _mainRigidbody)
                 {
-                    hit.collider.gameObject.transform.parent = null;
+                    //hit.collider.gameObject.transform.parent = null;
                     rigidBody.isKinematic = false;
                     rigidBody.AddExplosionForce(400, _explosionEffects[_currentExplodedDeck].transform.position, 1f);
                     _explosionEffects[_currentExplodedDeck].gameObject.SetActive(true);
-                    hit.collider.enabled = false;
+                    //hit.collider.enabled = false;
                 }
             }
         }

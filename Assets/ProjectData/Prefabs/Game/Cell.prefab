@@ -232,12 +232,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isBattleFieldCell: 0
-  _cellBody: {fileID: 2427977864649403773}
+  _cellBody: {fileID: 2072716860321654965}
   _missMarker: {fileID: 4419131012396204423}
   _hitMarker: {fileID: 1114974656746338723}
   _pointedBodyTransform: {fileID: 8032775015497642657}
   _missClickAudioSource: {fileID: 7723190909562641744}
   _hitAudioSource: {fileID: 8431268111987904693}
+  _bodyCollider: {fileID: 2892440165262331331}
+  _markerCollider: {fileID: 2710922519542930571}
+  _waterMaterial: {fileID: 2100000, guid: 2ceae0950de4d4f4888f5f6dc32c6dbd, type: 2}
+  _taggedMaterial: {fileID: 2100000, guid: 2257bbf233dcaf04cae16a831832ea1b, type: 2}
   <IsShipTarget>k__BackingField: 0
 --- !u!65 &2892440165262331331
 BoxCollider:

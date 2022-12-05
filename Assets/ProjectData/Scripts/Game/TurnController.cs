@@ -303,6 +303,17 @@ public class TurnController : IOnEventCallback, ICleanable, IController
                 }
             }
         }
+
+        foreach (var cell in _masterCellsLeft)
+        {
+            cell.DeactivateCollider();
+            cell.SetWaterMaterial();
+        }
+        foreach (var cell in _opponentCellsLeft)
+        {
+            cell.DeactivateCollider();
+            cell.SetWaterMaterial();
+        }
     }
 
     private void StartBattleStage()

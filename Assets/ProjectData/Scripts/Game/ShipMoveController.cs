@@ -36,7 +36,12 @@ public class ShipMoveController : IUpdatable, IController
             {
                 if (hit.collider)
                 {
-                    _movedShip.transform.position = hit.point - _offset;
+                    var posX = hit.point.x - _offset.x;
+                    var posY = _movedShip.transform.position.y;
+                    var posZ = hit.point.z - _offset.z;
+
+
+                    _movedShip.transform.position = new Vector3(posX, posY, posZ);
                 }
             }
         }

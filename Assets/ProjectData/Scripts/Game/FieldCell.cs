@@ -14,12 +14,17 @@ public class FieldCell : MonoBehaviour
     public Action OnCellClick;
 
     [SerializeField] private bool _isBattleFieldCell;
-    [SerializeField] private GameObject _cellBody;
+    [SerializeField] private MeshRenderer _cellBody;
     [SerializeField] private GameObject _missMarker;
     [SerializeField] private GameObject _hitMarker;
     [SerializeField] private Transform _pointedBodyTransform;
     [SerializeField] private AudioSource _missClickAudioSource;
     [SerializeField] private AudioSource _hitAudioSource;
+    [SerializeField] private Collider _bodyCollider;
+    [SerializeField] private Collider _markerCollider;
+
+    [SerializeField] private Material _waterMaterial;
+    [SerializeField] private Material _taggedMaterial;
 
     private Sequence _pointerEnterSequence;
     private Sequence _pointerExitSequence;
@@ -44,7 +49,7 @@ public class FieldCell : MonoBehaviour
     {
         if (!IsShipTarget)
         {
-            _cellBody.SetActive(false);
+            _cellBody.material = _taggedMaterial;
         }
     }
 
@@ -52,7 +57,7 @@ public class FieldCell : MonoBehaviour
     {
         if (!IsShipTarget)
         {
-            _cellBody.SetActive(true);
+            _cellBody.material = _waterMaterial;
         }
     }  
 
@@ -82,8 +87,16 @@ public class FieldCell : MonoBehaviour
                 _missClickAudioSource.Play();
             }            
         }
+    }       
+
+    public void SetWaterMaterial()
+    {
+        if (_cellBody.material != _waterMaterial)
+        {
+            _cellBody.material = _waterMaterial;
+        }
     }
-    
+
     public void SetAsShipTarget(bool isTarget)
     {
         IsShipTarget = isTarget;
@@ -133,5 +146,11 @@ public class FieldCell : MonoBehaviour
         };
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.CellClick, sendData, options, sendOptions);        
+    }
+
+    public void DeactivateCollider()
+    {
+        _bodyCollider.enabled = false;
+        _markerCollider.enabled = false;
     }
 }
