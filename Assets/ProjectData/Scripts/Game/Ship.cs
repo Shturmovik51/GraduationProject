@@ -1,3 +1,4 @@
+using DG.Tweening;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -15,6 +16,7 @@ public class Ship : MonoBehaviour
     [SerializeField] private GameObject _body;
     [SerializeField] private ShipType _shipType;
     [SerializeField] private AudioSource _shipSetInPositionAudioSource;
+    [SerializeField] private List<ParticleSystem> _explosionEffects;
  
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
@@ -22,6 +24,11 @@ public class Ship : MonoBehaviour
     private LayerMask _shipsLayer;
     private LayerMask _cellsLayer;
     private string _playerID;
+    private List<Collider> _colliders;
+    private Collider _mainCollider;
+    private Rigidbody _mainRigidbody;
+    private int _decsCount;
+    private int _currentExplodedDeck;
 
     public bool IsNotInStartPosition { get; private set; }
     public bool IsDestroyed { get; private set; }
@@ -37,7 +44,18 @@ public class Ship : MonoBehaviour
         _droppedPosition = transform.position;
         _droppedRotation = transform.rotation;
         _shipsLayer = LayerMask.GetMask("ShipsLayer");
-        _cellsLayer = LayerMask.GetMask("CellsLayer");       
+        _cellsLayer = LayerMask.GetMask("CellsLayer");
+
+        _colliders = GetComponentsInChildren<Collider>().ToList();
+        _mainCollider = GetComponent<Collider>();
+        _mainRigidbody = GetComponent<Rigidbody>();
+
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = false;
+        }
+        _mainCollider.enabled = true;
+        _decsCount = _explosionEffects.Count;
     }
 
     public void ClearShipPosition()
@@ -125,6 +143,7 @@ public class Ship : MonoBehaviour
             SendDestroyShipEvent();
             SetShipIsDestroyed(true);
             OnDestroyShip?.Invoke(_shipType);
+            StartExplosionProcess();
         }
 
     }
@@ -204,5 +223,46 @@ public class Ship : MonoBehaviour
         };
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.SetShipOnField, sendData, options, sendOptions);
+    }
+
+    private void StartExplosionProcess()
+    {
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = true;
+        }
+
+        ExploideDeck();
+    }
+
+    private void ExploideDeck()
+    {
+        var hits = Physics.SphereCastAll(_explosionEffects[_currentExplodedDeck].transform.position, 1f, Vector3.up).ToList();
+
+        foreach (var hit in hits)
+        {
+            if (hit.collider.TryGetComponent<Rigidbody>(out var rigidBody))
+            {
+                if (rigidBody != _mainRigidbody)
+                {
+                    hit.collider.gameObject.transform.parent = null;
+                    rigidBody.isKinematic = false;
+                    rigidBody.AddExplosionForce(400, _explosionEffects[_currentExplodedDeck].transform.position, 1f);
+                    _explosionEffects[_currentExplodedDeck].gameObject.SetActive(true);
+                    hit.collider.enabled = false;
+                }
+            }
+        }
+
+        var sequence = DOTween.Sequence();
+        sequence.AppendInterval(0.5f);
+        sequence.OnComplete(() =>
+        {
+            if(_currentExplodedDeck < _decsCount - 1)
+            {
+                _currentExplodedDeck++;
+                ExploideDeck();
+            }
+        });
     }
 }
