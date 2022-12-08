@@ -144,9 +144,6 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private void StartGame()
     {
-
-
-
         PhotonNetwork.LoadLevel(1);
     }    
 }

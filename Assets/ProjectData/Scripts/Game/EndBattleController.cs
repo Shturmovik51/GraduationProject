@@ -11,9 +11,12 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.SceneManagement;
+using System;
 
 public class EndBattleController : IOnEventCallback, ICleanable, IController
 {
+    public event Action OnEndBattle;
+
     private EndBattleView _endBattleView;
     private PlayerInfoView _playerInfoView;
     private string _playerID;
@@ -44,7 +47,9 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         if(_playerInfoView.ShipsCount == 0)
         {
             _endBattleView.SetLoseScreen();
+            //_autoBattleController.DeactivateAutoBAttle();
             SendEndBattleEvent();
+            OnEndBattle?.Invoke();
         }
     }
 
@@ -89,7 +94,9 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
                 if (_playerID != (string)photonEvent.CustomData)
                 {
                     _endBattleView.SetWinScreen();
+                    //_autoBattleController.DeactivateAutoBAttle();
                     UpdateCharacterStatistics();
+                    OnEndBattle?.Invoke();
                 }
                 break;
 
@@ -137,7 +144,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
             }
         }, result =>
         {
-
+            PhotonNetwork.AutomaticallySyncScene = true;
         }, OnError);
     }
 
@@ -192,7 +199,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
     }
 
     private void RestartGame()
-    {
+    {        
         SceneManager.LoadScene(1);
     }
 

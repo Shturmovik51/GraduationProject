@@ -99,5 +99,6 @@ public class EndBattleView : MonoBehaviour
     {
         _playAgainPanel.gameObject.SetActive(false);
         _opponentDisconnectPanel.gameObject.SetActive(true);
+        _restartButton.interactable = false;
     }
 }

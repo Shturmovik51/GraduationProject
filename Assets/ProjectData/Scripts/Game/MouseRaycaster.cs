@@ -29,7 +29,7 @@ public class MouseRaycaster
         _isCanHitCell = false;
     }    
 
-    public void SetUnableToHitCell(bool isCanHitCell)
+    public void SetHitCellAvaliability(bool isCanHitCell)
     {
         _isCanHitCell = isCanHitCell;
     }

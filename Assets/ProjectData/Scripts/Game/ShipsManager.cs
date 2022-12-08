@@ -27,7 +27,7 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
     public ShipsManager(GameData gameData, LoadedPlayersInfo playerinfo, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsRight, EndBattleController endBattleController)
     {
-        _playerShips = gameData.PlayerShipsHolder.GetComponentsInChildren<Ship>().ToList();
+        _playerShips = gameData.MasterShipsHolder.GetComponentsInChildren<Ship>().ToList();
         _opponentShips = gameData.OpponentShipsHolder.GetComponentsInChildren<Ship>().ToList();
         _masterCellsRight = masterCellsRight;
         _opponentCellsRight = opponentCellsRight;
@@ -82,7 +82,8 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
                         var cellIndex = (int)resultShipDestroyData[2];                        
 
                         var rotation = (Quaternion)resultShipDestroyData[3];
-                                              
+
+                        ship.DeactivateCollider();
                         ship.transform.position = _masterCellsRight[cellIndex].transform.position;
                         ship.transform.rotation = rotation * Quaternion.Euler(0, 180, 0);
                         ship.SetShipIsLocked(true);
@@ -100,7 +101,8 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
                         var cellIndex = (int)resultShipDestroyData[2];                        
 
                         var rotation = (Quaternion)resultShipDestroyData[3];
-                       
+
+                        ship.DeactivateCollider();
                         ship.transform.position = _opponentCellsRight[cellIndex].transform.position;
                         ship.transform.rotation = rotation * Quaternion.Euler(0, 180, 0);
                         ship.SetShipIsLocked(true);

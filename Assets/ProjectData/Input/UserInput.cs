@@ -80,6 +80,24 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""251c6c4b-1937-4635-8e45-b000692a2138"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AnyKey"",
+                    ""type"": ""Button"",
+                    ""id"": ""d19c85a7-9017-46c0-9788-06795f1903f0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -148,6 +166,28 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""action"": ""S_Button"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1225f24e-5c34-40eb-b421-fff4a1f131fe"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyBoard and Mouse"",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f6af2e4e-d35e-4cfe-9865-04d5c8771d0d"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyBoard and Mouse"",
+                    ""action"": ""AnyKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -179,6 +219,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         m_Player_S_Button = m_Player.FindAction("S_Button", throwIfNotFound: true);
         m_Player_Mouse_L = m_Player.FindAction("Mouse_L", throwIfNotFound: true);
         m_Player_Mouse_R = m_Player.FindAction("Mouse_R", throwIfNotFound: true);
+        m_Player_Escape = m_Player.FindAction("Escape", throwIfNotFound: true);
+        m_Player_AnyKey = m_Player.FindAction("AnyKey", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -244,6 +286,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_S_Button;
     private readonly InputAction m_Player_Mouse_L;
     private readonly InputAction m_Player_Mouse_R;
+    private readonly InputAction m_Player_Escape;
+    private readonly InputAction m_Player_AnyKey;
     public struct PlayerActions
     {
         private @UserInput m_Wrapper;
@@ -254,6 +298,8 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         public InputAction @S_Button => m_Wrapper.m_Player_S_Button;
         public InputAction @Mouse_L => m_Wrapper.m_Player_Mouse_L;
         public InputAction @Mouse_R => m_Wrapper.m_Player_Mouse_R;
+        public InputAction @Escape => m_Wrapper.m_Player_Escape;
+        public InputAction @AnyKey => m_Wrapper.m_Player_AnyKey;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -281,6 +327,12 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @Mouse_R.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_R;
                 @Mouse_R.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_R;
                 @Mouse_R.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse_R;
+                @Escape.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
+                @Escape.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
+                @Escape.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
+                @AnyKey.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAnyKey;
+                @AnyKey.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAnyKey;
+                @AnyKey.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAnyKey;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -303,6 +355,12 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @Mouse_R.started += instance.OnMouse_R;
                 @Mouse_R.performed += instance.OnMouse_R;
                 @Mouse_R.canceled += instance.OnMouse_R;
+                @Escape.started += instance.OnEscape;
+                @Escape.performed += instance.OnEscape;
+                @Escape.canceled += instance.OnEscape;
+                @AnyKey.started += instance.OnAnyKey;
+                @AnyKey.performed += instance.OnAnyKey;
+                @AnyKey.canceled += instance.OnAnyKey;
             }
         }
     }
@@ -324,5 +382,7 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         void OnS_Button(InputAction.CallbackContext context);
         void OnMouse_L(InputAction.CallbackContext context);
         void OnMouse_R(InputAction.CallbackContext context);
+        void OnEscape(InputAction.CallbackContext context);
+        void OnAnyKey(InputAction.CallbackContext context);
     }
 }

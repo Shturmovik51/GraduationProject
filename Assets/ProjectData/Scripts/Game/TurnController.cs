@@ -4,10 +4,15 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using PlayFab;
+using System;
 using System.Collections.Generic;
 
 public class TurnController : IOnEventCallback, ICleanable, IController
 {
+    public Action OnSetPlayerTurn;
+    public Action OnStartBattle;
+    public bool IsPlayerTurn { get; private set; }
+
     private List<FieldCell> _masterCellsLeft;
     private List<FieldCell> _masterCellsRight;
     private List<FieldCell> _opponentCellsLeft;
@@ -17,8 +22,10 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     private PlayerInfoView _opponentInfoView;
     private ShipsManager _shipsManager;
     private MouseRaycaster _mouseRaycaster;
+
     private string _playerName;
     private string _playerID;
+
     private bool _isReadyForRoll;
     private bool _isRolling;
     private bool _isCompleteRolling;
@@ -46,9 +53,27 @@ public class TurnController : IOnEventCallback, ICleanable, IController
             _playerID = playerinfo.PlayerID;
         }
 
-        _mouseRaycaster.OnMissShoot += SendChangeTurnEvent;
+        //_mouseRaycaster.OnMissShoot += SendChangeTurnEvent;
+
+        foreach (var cell in _masterCellsRight)
+        {
+            cell.OnCellClick += CheckForChangeTurn;
+        }
+        foreach (var cell in _opponentCellsRight)
+        {
+            cell.OnCellClick += CheckForChangeTurn;
+        }
 
         StartPlacementStage();
+    }
+
+    private void CheckForChangeTurn(FieldCell cell)
+    {
+        if (!cell.IsShipTarget)
+        {
+            IsPlayerTurn = false;
+            SendChangeTurnEvent();
+        }
     }
 
     private void SendReadinessEvent()
@@ -127,6 +152,8 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void SendChangeTurnEvent()
     {
+        IsPlayerTurn = false;
+
         ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
         SendOptions sendOptions = new SendOptions { Reliability = true };
@@ -208,8 +235,10 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
                 if (_playerID != playerID)
                 {
-                    _mouseRaycaster.SetUnableToHitCell(true);
+                    _mouseRaycaster.SetHitCellAvaliability(true);
                     _actionsView.RefreshBattleStageUI(true);
+                    OnSetPlayerTurn?.Invoke();
+                    IsPlayerTurn = true;
                 }
                 else if(_playerID == playerID)
                 {
@@ -273,7 +302,22 @@ public class TurnController : IOnEventCallback, ICleanable, IController
                 }
                 else
                 {
-                    SendRollEvent(index);
+                    var sendedValue = value;
+                    var sendedIndex = index;
+
+                    CheckValue();
+                    SendRollEvent(sendedIndex);
+
+                    void CheckValue()
+                    {
+                        if (sendedValue == _actionsView.OpponentRolledValue)
+                        {
+                            var (value, index) = _actionsView.GetRandomDiceValue();
+                            sendedValue = value;
+                            sendedIndex = index;
+                            CheckValue();
+                        }
+                    }
                 }
             });
         }
@@ -314,14 +358,25 @@ public class TurnController : IOnEventCallback, ICleanable, IController
             cell.DeactivateCollider();
             cell.SetWaterMaterial();
         }
+        //foreach (var cell in _masterCellsRight)
+        //{
+        //    cell.DeactivateCollider();
+        //    cell.SetWaterMaterial();
+        //}
+        //foreach (var cell in _opponentCellsRight)
+        //{
+        //    cell.DeactivateCollider();
+        //    cell.SetWaterMaterial();
+        //}
     }
 
     private void StartBattleStage()
     {
-        var rollResult = _actionsView.PlayerRolledValue > _actionsView.OpponentRolledValue;             //todo need rerol
+        var rollResult = _actionsView.PlayerRolledValue > _actionsView.OpponentRolledValue;            
         _actionsView.SetBattleStage(rollResult);
         _opponentInfoView.SetInfoTextVisibility(true);
-        _mouseRaycaster.SetUnableToHitCell(rollResult);
+        _mouseRaycaster.SetHitCellAvaliability(rollResult);
+        OnStartBattle?.Invoke();
     }
 
     public void CleanUp()

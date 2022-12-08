@@ -8,63 +8,119 @@ public class PlayerFieldView : MonoBehaviour
     [SerializeField] private Transform _leftPosition;
     [SerializeField] private Transform _rightPosition;
     [SerializeField] private Transform _centerPosition;
+    [SerializeField] private Transform _menuPosition;
 
     private Camera _camera;
     private Sequence _moveCameraSequence;
-    private bool _isLeftPosition;
-    private bool _isCenterPosition;
+
+    private CameraPositionType _lastPosition;
+    private CameraPositionType _currentPosition;
+
+    private bool _isMenuPosition;
 
     private void Awake()
     {
         _camera = Camera.main;
-        _isLeftPosition = true;
+        _lastPosition = CameraPositionType.Left;
+        _currentPosition = CameraPositionType.Menu;
+        _isMenuPosition = true;
     }
 
     public void SetCameraLeftPosition()
     {
-        _isLeftPosition = true;
-        _isCenterPosition = false;
-               
-        DOTween.Kill($"Move");
-        _moveCameraSequence = DOTween.Sequence();
-        _moveCameraSequence.SetId($"Move");
-        _moveCameraSequence.Append(_camera.transform.DOMove(_leftPosition.position, 1));
-        _moveCameraSequence.Join(_camera.transform.DORotate(_leftPosition.rotation.eulerAngles, 1));
+        if(_currentPosition == CameraPositionType.Left || _isMenuPosition)
+        {
+            return;
+        }
+
+        if(_currentPosition != CameraPositionType.Menu)
+        {
+            _lastPosition = _currentPosition;
+        }
+
+        _currentPosition = CameraPositionType.Left;
+        MoveCameraToPosition(_leftPosition);       
     }
 
     public void SetCameraRightPosition()
     {
-        _isLeftPosition = false;
-        _isCenterPosition = false;
+        if (_currentPosition == CameraPositionType.Right || _isMenuPosition)
+        {
+            return;
+        }
 
-        DOTween.Kill($"Move");
-        _moveCameraSequence = DOTween.Sequence();
-        _moveCameraSequence.SetId($"Move");
-        _moveCameraSequence.Append(_camera.transform.DOMove(_rightPosition.position, 1));
-        _moveCameraSequence.Join(_camera.transform.DORotate(_rightPosition.rotation.eulerAngles, 1));
+        if (_currentPosition != CameraPositionType.Menu)
+        {
+            _lastPosition = _currentPosition;
+        }
+
+        _currentPosition = CameraPositionType.Right;
+        MoveCameraToPosition(_rightPosition);        
     }
 
     public void SetCameraCenterPosition()
     {
-        _isCenterPosition = true;
+        if (_currentPosition == CameraPositionType.Center || _isMenuPosition)
+        {
+            return;
+        }
 
+        if (_currentPosition != CameraPositionType.Menu)
+        {
+            _lastPosition = _currentPosition;
+        }
+        
+        _currentPosition= CameraPositionType.Center;
+        MoveCameraToPosition(_centerPosition);        
+    }
+
+    public void SetCameraMenuPosition()
+    {
+        _lastPosition = _currentPosition;
+        _currentPosition = CameraPositionType.Menu;
+        _isMenuPosition = true;
+        MoveCameraToPosition(_menuPosition);
+    }
+
+    private void MoveCameraToPosition(Transform point)
+    {
         DOTween.Kill($"Move");
         _moveCameraSequence = DOTween.Sequence();
         _moveCameraSequence.SetId($"Move");
-        _moveCameraSequence.Append(_camera.transform.DOMove(_centerPosition.position, 1));
-        _moveCameraSequence.Join(_camera.transform.DORotate(_centerPosition.rotation.eulerAngles, 1));
+        _moveCameraSequence.Append(_camera.transform.DOMove(point.position, 1));
+        _moveCameraSequence.Join(_camera.transform.DORotate(point.rotation.eulerAngles, 1));
     }
 
-    public void SetCameraLeftOrRightPosition()
+    public void SetLastPosition()
     {
-        if(_isLeftPosition && _isCenterPosition)
+        if (_isMenuPosition)
         {
-            SetCameraLeftPosition();
+            return;
         }
 
-        if (!_isLeftPosition && _isCenterPosition)
+        switch (_lastPosition)
         {
-            SetCameraRightPosition();
+            case CameraPositionType.None:
+                break;
+            case CameraPositionType.Left:
+                SetCameraLeftPosition();
+                break;
+            case CameraPositionType.Right:
+                SetCameraRightPosition();
+                break;
+            case CameraPositionType.Center:
+                SetCameraCenterPosition();
+                break;
+            case CameraPositionType.Menu:
+                break;
+            default:
+                break;
         }
+    }
+
+    public void SetLastPositionAfterMenu()
+    {
+        _isMenuPosition = false;
+        SetLastPosition();
     }
 }

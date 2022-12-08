@@ -23,8 +23,9 @@ namespace Engine
 
             var shipMoveController = new ShipMoveController(userInput);
             var mouseRaycaster = new MouseRaycaster(userInput, shipMoveController);
+            var gameMenuController = new GameMenuController(gameData, userInput);
 
-            var playerFieldController = new PlayerFieldController(userInput, playerFieldView);
+            var playerFieldController = new PlayerFieldController(userInput, playerFieldView, gameMenuController);
 
             var endBattleController = new EndBattleController(gameData, playerInfo);
 
@@ -33,11 +34,16 @@ namespace Engine
             var turnController = new TurnController(masterCellsLeft, masterCellsRight, opponentCellsLeft, 
                     opponentCellsRight, gameData, playerInfo, shipsManager, mouseRaycaster);
 
+            var autoBattleController = new AutoBattleController(gameData, turnController, masterCellsRight, opponentCellsRight,
+                    mouseRaycaster, endBattleController);
 
             controllersManager.Add(inputSystemController);
             controllersManager.Add(shipMoveController);
             controllersManager.Add(turnController);
             controllersManager.Add(endBattleController);
+            controllersManager.Add(autoBattleController);
+            controllersManager.Add(gameMenuController);
+            controllersManager.Add(playerFieldController);
 
             PhotonNetwork.AddCallbackTarget(turnController);
             PhotonNetwork.AddCallbackTarget(shipsManager);

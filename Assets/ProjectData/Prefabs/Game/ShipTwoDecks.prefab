@@ -41186,6 +41186,7 @@ Transform:
   m_Children:
   - {fileID: 4260351756037116248}
   - {fileID: 4260351755929101683}
+  - {fileID: 1999001490656101438}
   m_Father: {fileID: 4260351757714202470}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -47059,7 +47060,6 @@ Transform:
   m_Children:
   - {fileID: 83876718361809993}
   - {fileID: 6222189762466603416}
-  - {fileID: 1999001490656101438}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -47108,6 +47108,7 @@ MonoBehaviour:
   _explosionEffects:
   - {fileID: 118925515878187739}
   - {fileID: 2847793105258688659}
+  _shipCollider: {fileID: 4260351757714202464}
 --- !u!65 &4260351757714202464
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -47119,7 +47120,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2, y: 0.1, z: 1}
+  m_Size: {x: 2, y: 0.4, z: 1}
   m_Center: {x: 0.5, y: 0, z: 0}
 --- !u!82 &6549368612377105556
 AudioSource:
@@ -84913,7 +84914,7 @@ Transform:
   - {fileID: 6989488155470852101}
   - {fileID: 243736299055657243}
   - {fileID: 9102027080848104690}
-  m_Father: {fileID: 4260351757714202470}
+  m_Father: {fileID: 6222189762466603416}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7854785518444972637

@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         if (PhotonNetwork.IsMasterClient)
         {
-            var playerObject = Instantiate(_gameData.UserViewField, _gameData.PlayerTransform);
+            var playerObject = Instantiate(_gameData.UserViewField, _gameData.MasterTransform);
             _playerFieldView = playerObject.GetComponent<PlayerFieldView>();
 
             if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("on", out object userName))
@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 var sprite = _gameData.AvatarsConfig.GetAvatarByIndex(spriteIndex);
                 
                 _playersInfo.SetPlayerCharacterInfo(characterName, level, experience, sprite, characterID);
-                _gameData.PlayerView.InitInfoView(characterName, level, experience);
+                _gameData.PlayerView.InitInfoView(characterName, level, experience, sprite);
 
                 SendCharacterInfoEvent(level, experience, spriteIndex, characterName);
 
@@ -269,7 +269,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
                     var sprite = _gameData.AvatarsConfig.GetAvatarByIndex(spriteIndex);
 
                     _playersInfo.SetOpponentCharacterInfo(characterName, level, experience, sprite);
-                    _gameData.OpponentView.InitInfoView(characterName, level, experience);
+                    _gameData.OpponentView.InitInfoView(characterName, level, experience, sprite);
                 }
 
                 break;

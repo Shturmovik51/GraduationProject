@@ -75,7 +75,7 @@ public class ShipCell : MonoBehaviour
         }       
     }    
 
-    private void OnCellClick()
+    private void OnCellClick(FieldCell fieldCell)
     {
         _hitEffect.SetActive(true);
         IsDestroyed = true;

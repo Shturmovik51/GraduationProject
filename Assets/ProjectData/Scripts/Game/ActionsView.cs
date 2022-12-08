@@ -13,8 +13,11 @@ public class ActionsView : MonoBehaviour
     [SerializeField] private Button _actionButton;
     [SerializeField] private Image _plyerDiceImage;
     [SerializeField] private Image _opponentDiceImage;
-    [SerializeField] private List<DiceValue> _rollSystem;       
+    [SerializeField] private List<DiceValue> _rollSystem;
+    [SerializeField] private Transform _hidePosition;
+    [SerializeField] private Button _hideButton;
 
+    public Button HideButton => _hideButton;
     public int PlayerRolledValue { get; private set; }
     public int OpponentRolledValue { get; private set; }
 
@@ -45,11 +48,11 @@ public class ActionsView : MonoBehaviour
         _opponentActionText.text = text;
     }
 
-    public void SetOpponentRollValue(int value)
+    public void SetOpponentRollValue(int index)
     {
         _opponentActionText.enabled = false;
         _opponentDiceImage.enabled = true;
-        var dice = _rollSystem[value];
+        var dice = _rollSystem[index];
         _opponentDiceImage.sprite = dice.Sprite;
         OpponentRolledValue = dice.Value;
     }

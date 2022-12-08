@@ -12,6 +12,9 @@ public class PlayerInfoView : MonoBehaviour
     [SerializeField] private TMP_Text _playerTitleText;
     [SerializeField] private TMP_Text _playerInfoText;
     [SerializeField] private GameObject _shipMarkersHolder;
+    [SerializeField] private Image _plaerImage;
+    [SerializeField] private Transform _hidePosition;
+
     public int ShipsCount { get; private set; }
 
     private List<Image> _shipMarkers;
@@ -32,19 +35,19 @@ public class PlayerInfoView : MonoBehaviour
         {
             case ChangeCountType.Add:
                 ShipsCount++;
-                var offMarker = _shipMarkers.Find(marker => marker.enabled == false);
+                var offMarker = _shipMarkers.Find(marker => !marker.gameObject.activeInHierarchy);
                 if (offMarker != null)
                 {
-                    offMarker.enabled = true;
+                    offMarker.gameObject.SetActive(true);
                 }
                 break;
 
             case ChangeCountType.Remove:
                 ShipsCount--;
-                var onMarker = _shipMarkers.Find(marker => marker.enabled == true);
+                var onMarker = _shipMarkers.Find(marker => marker.gameObject.activeInHierarchy);
                 if (onMarker != null)
                 {
-                    onMarker.enabled = false;
+                    onMarker.gameObject.SetActive(false);
                 }
                 break;
 
@@ -52,9 +55,10 @@ public class PlayerInfoView : MonoBehaviour
                 break;
         }  
     }
-    public void InitInfoView(string charName, int level, int experience)
+    public void InitInfoView(string charName, int level, int experience, Sprite sprite)
     {
         _playerTitleText.text = charName;
         _playerInfoText.text = $"Level: {level} | Experience: {experience}";
+        _plaerImage.sprite = sprite;
     }
 }

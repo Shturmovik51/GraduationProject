@@ -17,6 +17,7 @@ public class Ship : MonoBehaviour
     [SerializeField] private ShipType _shipType;
     [SerializeField] private AudioSource _shipSetInPositionAudioSource;
     [SerializeField] private List<ParticleSystem> _explosionEffects;
+    [SerializeField] private Collider _shipCollider;
  
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
@@ -91,6 +92,7 @@ public class Ship : MonoBehaviour
         {
             ClearShipPosition();
             transform.position = _droppedPosition;
+            transform.rotation = _droppedRotation;
             SetShipIsInPosition(true);
             return;
         }
@@ -99,6 +101,7 @@ public class Ship : MonoBehaviour
         {
             ClearShipPosition();
             transform.position = _droppedPosition;
+            transform.rotation = _droppedRotation;
             SetShipIsInPosition(true);
             return;
         }
@@ -264,5 +267,10 @@ public class Ship : MonoBehaviour
                 ExploideDeck();
             }
         });
+    }
+
+    public void DeactivateCollider()
+    {
+        _shipCollider.enabled = false;
     }
 }

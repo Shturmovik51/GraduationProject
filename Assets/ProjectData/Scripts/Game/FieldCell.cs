@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 
 public class FieldCell : MonoBehaviour
 {
-    public Action OnCellClick;
+    public Action<FieldCell> OnCellClick;
 
     [SerializeField] private bool _isBattleFieldCell;
     [SerializeField] private MeshRenderer _cellBody;
@@ -63,7 +63,7 @@ public class FieldCell : MonoBehaviour
 
     public void InitAction()
     {
-        OnCellClick?.Invoke();
+        OnCellClick?.Invoke(this);
         IsUsed = true;
 
         if (IsBattleFieldCell)
