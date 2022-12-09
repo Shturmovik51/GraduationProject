@@ -18,13 +18,13 @@ public class GameMenuController : ICleanable, IController
     private SoundManager _soundManager;
     private bool _isClosed;
     private bool _isFirstClick;
-    public GameMenuController(GameData gameData, UserInput input, SoundManager soundManager)
+    public GameMenuController(GameData gameData, UserInput input, SoundManager soundManager, LoadedPlayersInfo playersInfo)
     {
         _gameMenuView = gameData.PlayerGameMenuView;
         _gameMenuView.Init();
         _soundManager = soundManager;
         _optionsPanelView = _gameMenuView.OptionsPanelView;
-        _optionsPanelView.Init();
+        _optionsPanelView.Init(playersInfo.PlayerID);
 
         _gameMenuView.StartBattleButton.onClick.AddListener(OpenCloseBox);
         _gameMenuView.OptionsButton.onClick.AddListener(() => _optionsPanelView.gameObject.SetActive(true));

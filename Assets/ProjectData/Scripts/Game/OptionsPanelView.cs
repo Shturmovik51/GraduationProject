@@ -10,13 +10,17 @@ public class OptionsPanelView : MonoBehaviour
     [SerializeField] private Button _confirmButton;
     [SerializeField] private Button _backButton;
 
+    private string _playerID; 
+
     public Button ConfirmButton => _confirmButton;
     public Button BackButton => _backButton;
     public Slider MusicSlider => _musicSlider;
     public Slider EffectsSlider => _effectsSlider;
 
-    public void Init()
+    public void Init(string playerID)
     {
+        _playerID = playerID;
+
         _confirmButton.onClick.AddListener(SetSoundOptions);
         _backButton.onClick.AddListener(ResetSoundOptions);
 
@@ -35,32 +39,32 @@ public class OptionsPanelView : MonoBehaviour
 
     private void SetSoundOptions()
     {
-        PlayerPrefs.SetFloat("MusicSoundOptions", _musicSlider.value);
-        PlayerPrefs.SetFloat("EffectsSoundOptions", _effectsSlider.value);
+        PlayerPrefs.SetFloat($"MusicSoundOptions", _musicSlider.value);
+        PlayerPrefs.SetFloat($"EffectsSoundOptions", _effectsSlider.value);
 
         gameObject.SetActive(false);
     }
 
     private void ResetSoundOptions()
     {
-        if (PlayerPrefs.HasKey("MusicSoundOptions"))
+        if (PlayerPrefs.HasKey($"MusicSoundOptions"))
         {
-            _musicSlider.value = PlayerPrefs.GetFloat("MusicSoundOptions");
+            _musicSlider.value = PlayerPrefs.GetFloat($"MusicSoundOptions");
         }
         else
         {
             _musicSlider.value = _musicSlider.maxValue;
-            PlayerPrefs.SetFloat("MusicSoundOptions", _musicSlider.value);
+            PlayerPrefs.SetFloat($"MusicSoundOptions", _musicSlider.value);
         }
 
-        if (PlayerPrefs.HasKey("EffectsSoundOptions"))
+        if (PlayerPrefs.HasKey($"EffectsSoundOptions"))
         {
-            _effectsSlider.value = PlayerPrefs.GetFloat("EffectsSoundOptions");
+            _effectsSlider.value = PlayerPrefs.GetFloat($"EffectsSoundOptions");
         }
         else
         {
             _effectsSlider.value = _effectsSlider.maxValue;
-            PlayerPrefs.SetFloat("EffectsSoundOptions", _effectsSlider.value);
+            PlayerPrefs.SetFloat($"EffectsSoundOptions", _effectsSlider.value);
         }
 
         gameObject.SetActive(false);

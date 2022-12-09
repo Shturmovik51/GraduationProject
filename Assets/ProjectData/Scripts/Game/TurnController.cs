@@ -135,7 +135,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
 
     private void SendSincFieldsEvent(int intData)
     {
-        _isCompleteRolling = true;
+        //_isCompleteRolling = true;
 
         ReceiverGroup receiverGroup = ReceiverGroup.All;
         RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };

@@ -15,12 +15,19 @@ public class EnterInGameWindow : MonoBehaviour
     [SerializeField] private LobbyScreen _lobbyScreen;
 
     private SoundManager _soundManager;
+    private SceneLoader _sceneLoader;
+
+    private void Awake()
+    {
+        _sceneLoader = FindObjectOfType<SceneLoader>();
+        _soundManager = FindObjectOfType<SoundManager>();
+    }
 
     private void Start()
     {
+        _sceneLoader.CompleteLoadScene();
         _signInButton.onClick.AddListener(OpenSignInWindow);
         _createAcciuntButton.onClick.AddListener(OpenCreateAccountWindow);
-        _soundManager = FindObjectOfType<SoundManager>();
         _soundManager.SubscribeMenuButtons();
         _soundManager.PlayMenuSound();
 

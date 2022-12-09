@@ -35,6 +35,7 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
         _playerView = gameData.PlayerView;
         _opponentView = gameData.OpponentView;
 
+
         _allShips = new List<Ship>();
         _allShips.AddRange(_playerShips);
         _allShips.AddRange(_opponentShips);

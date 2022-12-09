@@ -1,16 +1,11 @@
 using Engine;
 using ExitGames.Client.Photon;
-using Newtonsoft.Json.Serialization;
 using Photon.Pun;
 using Photon.Realtime;
 using PlayFab.ClientModels;
 using PlayFab;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using UnityEngine.SceneManagement;
 using System;
 using DG.Tweening;
 
@@ -27,8 +22,10 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
     private VoteType _opponentVoteResult;
     private GameMenuController _gameMenuController;
     private SoundManager _soundManager;
+    private SceneLoader _sceneLoader;
+    private MouseRaycaster _mouseRaycaster;
     public EndBattleController(GameData gameData, LoadedPlayersInfo playerInfo, GameMenuController gameMenuController,
-                SoundManager soundManager)
+                SoundManager soundManager, SceneLoader sceneLoader, MouseRaycaster mouseRaycaster)
     {
         _endBattleView = gameData.EndBattleView;
         _playerInfoView = gameData.PlayerView;
@@ -36,6 +33,8 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         _loadedPlayersInfo = playerInfo;
         _gameMenuController = gameMenuController;
         _soundManager = soundManager;
+        _sceneLoader = sceneLoader;
+        _mouseRaycaster = mouseRaycaster;
 
         _playerVoteResult = VoteType.None;
         _opponentVoteResult = VoteType.None;
@@ -47,6 +46,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         _gameMenuController.OnExitGame += ExitGameDuringFight;
 
         _endBattleView.RestartButton.interactable = false;
+        _sceneLoader = sceneLoader;
     }
 
     public void CheckForRemainingShips()
@@ -63,6 +63,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
             _soundManager.PlayEndScreenSound();
             SendEndBattleEvent();
             OnEndBattle?.Invoke();
+            _mouseRaycaster.BlockRayCaster();
 
             var sequenc = DOTween.Sequence();
             sequenc.AppendInterval(2);
@@ -111,6 +112,14 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.LeaveTheGame, _playerID, options, sendOptions);
     }
+    public void SendRestartBattleEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.RestartBattle, _playerID, options, sendOptions);
+    }
 
     public void OnEvent(EventData photonEvent)
     {
@@ -124,6 +133,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
                     _soundManager.PlayVictoryTheme();
                     UpdateCharacterStatistics();
                     OnEndBattle?.Invoke();
+                    _mouseRaycaster.BlockRayCaster();
 
                     var sequenc = DOTween.Sequence();
                     sequenc.AppendInterval(2);
@@ -157,6 +167,14 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
                 if (_playerID != (string)photonEvent.CustomData)
                 {
                     _soundManager.PlayGameNearVictoryTheme();
+                }
+                break;
+
+            case EventType.RestartBattle:
+
+                if (_playerID != (string)photonEvent.CustomData)
+                {
+                    _sceneLoader.LoadScene(SceneType.Scene2);
                 }
                 break;
         }
@@ -242,12 +260,13 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         PhotonNetwork.AutomaticallySyncScene = false;
         SendOutGameEvent();
         PlayerPrefs.SetInt("LoggedIn", 1);
-        SceneManager.LoadScene(0);
+        _sceneLoader.LoadScene(SceneType.Scene1);
     }
 
     private void RestartGame()
-    {        
-        SceneManager.LoadScene(1);
+    {
+        _sceneLoader.LoadScene(SceneType.Scene2);
+        SendRestartBattleEvent();
     }
 
     public void CleanUp()

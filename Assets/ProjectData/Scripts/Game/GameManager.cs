@@ -246,11 +246,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        _opponentCellsLeft[(int)cellClickResult[0]].InitAction();
+                        //_opponentCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                     else if (!PhotonNetwork.IsMasterClient)
                     {
-                        _masterCellsLeft[(int)cellClickResult[0]].InitAction();
+                        //_masterCellsLeft[(int)cellClickResult[0]].InitAction();
                     }
                 }
                 break;

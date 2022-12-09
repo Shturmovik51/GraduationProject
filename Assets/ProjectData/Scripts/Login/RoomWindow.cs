@@ -25,9 +25,15 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private const string CLIENT_NAME_KEY = "cn";
     private const string CLIENT_ID_KEY = "cid";
+    private SceneLoader _sceneLoader;
 
     //private Room _room;
     private Dictionary<Player, TextMeshProUGUI> _players;
+
+    private void Awake()
+    {
+        _sceneLoader = FindObjectOfType<SceneLoader>();
+    }
 
     private void Start()
     {
@@ -144,6 +150,6 @@ public class RoomWindow : MonoBehaviourPunCallbacks
 
     private void StartGame()
     {
-        PhotonNetwork.LoadLevel(1);
+        _sceneLoader.LoadScene(SceneType.Scene2);
     }    
 }

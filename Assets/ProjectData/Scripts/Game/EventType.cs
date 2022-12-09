@@ -21,4 +21,5 @@ public enum EventType
     YesOrNo = 14,
     LeaveTheGame = 15,
     NearLose = 16,
+    RestartBattle = 17,
 }

@@ -81,8 +81,8 @@ public class ActionsView : MonoBehaviour
     {
         _plyerDiceImage.enabled = false;
         _opponentDiceImage.enabled = false;
-        _actionButton.gameObject.SetActive(true);
-        _actionButtonText.text = "Surrender";
+        //_actionButton.gameObject.SetActive(true);
+        //_actionButtonText.text = "Surrender";
         _actionButton.onClick.RemoveAllListeners();
         RefreshBattleStageUI(isPlayerTurn);
     }

@@ -16,8 +16,9 @@ public class Ship : MonoBehaviour
     [SerializeField] private GameObject _body;
     [SerializeField] private ShipType _shipType;
     [SerializeField] private AudioSource _shipSetInPositionAudioSource;
-    [SerializeField] private List<ParticleSystem> _explosionEffects;
+    [SerializeField] private AudioSource _explosionAudioSource;
     [SerializeField] private Collider _shipCollider;
+    [SerializeField] private List<ParticleSystem> _explosionEffects;
  
     private List<ShipCell> _shipCells;
     private Vector3 _droppedPosition;
@@ -138,9 +139,6 @@ public class Ship : MonoBehaviour
     {
         var aliveDeck = _shipCells.Find(cell => !cell.IsDestroyed);
 
-        Debug.Log(_shipCells.Find(cell => !cell.IsDestroyed));
-        Debug.Log(aliveDeck);
-
         if(aliveDeck == null)
         {
             SendDestroyShipEvent();
@@ -256,6 +254,7 @@ public class Ship : MonoBehaviour
                     rigidBody.isKinematic = false;
                     rigidBody.AddExplosionForce(400, _explosionEffects[_currentExplodedDeck].transform.position, 1f);
                     _explosionEffects[_currentExplodedDeck].gameObject.SetActive(true);
+                    _explosionAudioSource.Play();
                     //hit.collider.enabled = false;
                 }
             }

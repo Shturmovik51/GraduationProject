@@ -64,29 +64,38 @@ public class FieldCell : MonoBehaviour
     public void InitAction()
     {
         OnCellClick?.Invoke(this);
-        IsUsed = true;
 
-        if (IsBattleFieldCell)
+        if (IsBattleFieldCell && !IsUsed)
         {
             if (!IsShipTarget)
             {
                 _missMarker.SetActive(true);
                 _missClickAudioSource.Play();
+                Debug.Log("play 1");
             }
             else
             {
                 _hitMarker.SetActive(true);
                 _hitAudioSource.Play();
+                Debug.Log("play 2");
             }
         }
-        else if(!IsBattleFieldCell)
+        else if(!IsBattleFieldCell && !IsUsed)
         {
             if (!IsShipTarget)
             {
                 _missMarker.SetActive(true);
                 _missClickAudioSource.Play();
-            }            
+                Debug.Log("play 3");
+            }
+            else
+            {
+                _hitAudioSource.Play();
+                Debug.Log("play 4");
+            }
         }
+
+        IsUsed = true;
     }       
 
     public void SetWaterMaterial()

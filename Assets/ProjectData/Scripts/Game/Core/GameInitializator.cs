@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Input;
-using System.Runtime.CompilerServices;
 using Photon.Pun;
-using UnityEngine.Playables;
 
 namespace Engine
 {
@@ -15,6 +13,9 @@ namespace Engine
                 List<FieldCell> opponentCellsRight, LoadedPlayersInfo playerInfo, GameData gameData)
         {
             var sounrManager = Object.FindObjectOfType<SoundManager>();
+            var sceneLoader = Object.FindObjectOfType<SceneLoader>();
+
+            sceneLoader.CompleteLoadScene();
             sounrManager.AddShipsAudioSources();
             sounrManager.AddCellsAudioSources();
             sounrManager.SubscribeGameButtons();
@@ -24,12 +25,13 @@ namespace Engine
             var userInput = inputSystemController.GetInputSystem();
 
             var shipMoveController = new ShipMoveController(userInput);
-            var mouseRaycaster = new MouseRaycaster(userInput, shipMoveController);
-            var gameMenuController = new GameMenuController(gameData, userInput, sounrManager);
+            var gameMenuController = new GameMenuController(gameData, userInput, sounrManager, playerInfo);
+            var mouseRaycaster = new MouseRaycaster(userInput, shipMoveController, gameMenuController);
 
             var playerFieldController = new PlayerFieldController(userInput, playerFieldView, gameMenuController);
 
-            var endBattleController = new EndBattleController(gameData, playerInfo, gameMenuController, sounrManager);
+            var endBattleController = new EndBattleController(gameData, playerInfo, gameMenuController, 
+                    sounrManager, sceneLoader, mouseRaycaster);
 
             var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight, endBattleController);
 
@@ -40,6 +42,7 @@ namespace Engine
                     mouseRaycaster, endBattleController);
 
             controllersManager.Add(inputSystemController);
+            controllersManager.Add(mouseRaycaster);
             controllersManager.Add(shipMoveController);
             controllersManager.Add(turnController);
             controllersManager.Add(endBattleController);

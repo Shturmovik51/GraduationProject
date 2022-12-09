@@ -37,6 +37,21 @@ public class SoundManager : MonoBehaviour
             _winTheme,
             _loseTheme,
         };
+
+        LoadSoundOptions();
+    }
+
+    private void LoadSoundOptions()
+    {
+        if (PlayerPrefs.HasKey($"MusicSoundOptions"))
+        {
+            SetMusicValue(PlayerPrefs.GetFloat($"MusicSoundOptions"));
+        }        
+
+        if (PlayerPrefs.HasKey($"EffectsSoundOptions"))
+        {
+            SetEffectsValue(PlayerPrefs.GetFloat($"EffectsSoundOptions"));
+        }        
     }
 
     public void PlayMenuSound()
@@ -174,26 +189,26 @@ public class SoundManager : MonoBehaviour
 
         foreach(var ship in ships)
         {
-            _shipsAudioSourses.Add(ship.GetComponentInChildren<AudioSource>());
+            _shipsAudioSourses.AddRange(ship.GetComponentsInChildren<AudioSource>());
         }
     }
 
     public void AddCellsAudioSources()
     {
-        if (_shipsAudioSourses != null)
+        if (_cellsAudioSourses != null)
         {
-            _shipsAudioSourses.Clear();
+            _cellsAudioSourses.Clear();
         }
         else
         {
-            _shipsAudioSourses = new List<AudioSource>();
+            _cellsAudioSourses = new List<AudioSource>();
         }
 
         var cells = FindObjectsOfType<FieldCell>().ToList();
 
         foreach (var cell in cells)
         {
-            _shipsAudioSourses.Add(cell.GetComponentInChildren<AudioSource>());
+            _cellsAudioSourses.AddRange(cell.GetComponentsInChildren<AudioSource>());
         }
     }
 }

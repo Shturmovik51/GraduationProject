@@ -19,9 +19,13 @@ public class PlayerInfoView : MonoBehaviour
 
     private List<Image> _shipMarkers;
     
-    private void Awake()
+    private void Start()
     {
         _shipMarkers = _shipMarkersHolder.GetComponentsInChildren<Image>().ToList();
+        foreach (var shipMarker in _shipMarkers)
+        {
+            shipMarker.gameObject.SetActive(false);
+        }
     }
 
     public void SetInfoTextVisibility(bool isVisible)
