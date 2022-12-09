@@ -15,6 +15,8 @@ namespace Engine
                 List<FieldCell> opponentCellsRight, LoadedPlayersInfo playerInfo, GameData gameData)
         {
             var sounrManager = Object.FindObjectOfType<SoundManager>();
+            sounrManager.AddShipsAudioSources();
+            sounrManager.AddCellsAudioSources();
             sounrManager.SubscribeGameButtons();
             sounrManager.PlayGameMainTheme();
 
@@ -23,11 +25,11 @@ namespace Engine
 
             var shipMoveController = new ShipMoveController(userInput);
             var mouseRaycaster = new MouseRaycaster(userInput, shipMoveController);
-            var gameMenuController = new GameMenuController(gameData, userInput);
+            var gameMenuController = new GameMenuController(gameData, userInput, sounrManager);
 
             var playerFieldController = new PlayerFieldController(userInput, playerFieldView, gameMenuController);
 
-            var endBattleController = new EndBattleController(gameData, playerInfo);
+            var endBattleController = new EndBattleController(gameData, playerInfo, gameMenuController, sounrManager);
 
             var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight, endBattleController);
 

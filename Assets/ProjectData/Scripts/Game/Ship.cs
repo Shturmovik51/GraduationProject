@@ -168,7 +168,11 @@ public class Ship : MonoBehaviour
             IsPositioned = isPositioned;
             SendSetShipOnFieldEvent(isPositioned);
             OnSetShipOnField?.Invoke(isPositioned);
-            _shipSetInPositionAudioSource.Play();
+
+            if (isPositioned)
+            {
+                _shipSetInPositionAudioSource.Play();
+            }
         }
     }
 

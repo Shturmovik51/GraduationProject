@@ -1,7 +1,4 @@
 using DG.Tweening;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,13 +7,19 @@ public class GameMenuView : MonoBehaviour
 {  
     [SerializeField] private Transform _gameBoxConnector;
     [SerializeField] private Button _startBattleButton;
+    [SerializeField] private Button _optionsButton;
+    [SerializeField] private Button _exitButton;
     [SerializeField] private TMP_Text _startBattleButtonText;
     [SerializeField] private Canvas _gameMenuCanvas;
+    [SerializeField] private OptionsPanelView optionsPanelView;
 
     private Sequence _openSequence;
     private Sequence _closeSequence;
 
+    public OptionsPanelView OptionsPanelView => optionsPanelView;
     public Button StartBattleButton => _startBattleButton;
+    public Button OptionsButton => _optionsButton;
+    public Button ExitButton => _exitButton;
 
     public void Init()
     {
@@ -40,8 +43,16 @@ public class GameMenuView : MonoBehaviour
         _closeSequence.Append(_gameBoxConnector.DOLocalRotate(new Vector3(0, 0, 180), 1));
     }
 
-    public void UnsubscribeButton()
+    public void UnsubscribeButtons()
     {
         _startBattleButton.onClick.RemoveAllListeners();
+        _optionsButton.onClick.RemoveAllListeners();
+        _exitButton.onClick.RemoveAllListeners();
+    }
+
+    public void SetStartButtonText(string text)
+    {
+        _startBattleButtonText.text = text;
+
     }
 }

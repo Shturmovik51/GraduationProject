@@ -20,4 +20,5 @@ public enum EventType
     CharacterInfo = 13,
     YesOrNo = 14,
     LeaveTheGame = 15,
+    NearLose = 16,
 }

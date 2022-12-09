@@ -21,6 +21,7 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
     private string _playerID;
     private Action<ShipType> _onDestroyShipAction;
     private Action<bool> _onSetShipOnFieldAction;
+
     public List<Ship> PlayerShips => _playerShips;
     public List<Ship> OpponentShips => _opponentShips;
 
@@ -90,7 +91,6 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
                         ship.SetShipIsDestroyed(true);
                         ship.SetExplosionRadius();
 
-                        Debug.Log(rotation);
                     }
 
                     if (!PhotonNetwork.IsMasterClient)
@@ -108,8 +108,6 @@ public class ShipsManager : IOnEventCallback, ICleanable, IController
                         ship.SetShipIsLocked(true);
                         ship.SetShipIsDestroyed(true);
                         ship.SetExplosionRadius();
-
-                        Debug.Log(rotation);
                     }
 
                     _opponentView.ChangeShipsCount(ChangeCountType.Remove);

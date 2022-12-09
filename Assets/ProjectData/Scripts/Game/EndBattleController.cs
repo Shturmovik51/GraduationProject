@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.SceneManagement;
 using System;
+using DG.Tweening;
 
 public class EndBattleController : IOnEventCallback, ICleanable, IController
 {
@@ -24,12 +25,17 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
     private const int BATTLE_REVARD = 300;
     private VoteType _playerVoteResult;
     private VoteType _opponentVoteResult;
-    public EndBattleController(GameData gameData, LoadedPlayersInfo playerInfo)
+    private GameMenuController _gameMenuController;
+    private SoundManager _soundManager;
+    public EndBattleController(GameData gameData, LoadedPlayersInfo playerInfo, GameMenuController gameMenuController,
+                SoundManager soundManager)
     {
         _endBattleView = gameData.EndBattleView;
         _playerInfoView = gameData.PlayerView;
         _playerID = playerInfo.PlayerID;
         _loadedPlayersInfo = playerInfo;
+        _gameMenuController = gameMenuController;
+        _soundManager = soundManager;
 
         _playerVoteResult = VoteType.None;
         _opponentVoteResult = VoteType.None;
@@ -37,20 +43,40 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         _endBattleView.PlayerYesButton.onClick.AddListener(OnClickYesButton);
         _endBattleView.PlayerNoButton.onClick.AddListener(OnClickNoButton);
         _endBattleView.RestartButton.onClick.AddListener(RestartGame);
-        _endBattleView.ExitButton.onClick.AddListener(OutGame);
+        _endBattleView.ExitButton.onClick.AddListener(ExiGame);
+        _gameMenuController.OnExitGame += ExitGameDuringFight;
 
         _endBattleView.RestartButton.interactable = false;
     }
 
     public void CheckForRemainingShips()
     {
+        if(_playerInfoView.ShipsCount == 2)
+        {
+            _soundManager.PlayGameNearLoseTheme();
+            SendNearLoseEvent();
+        }
+
         if(_playerInfoView.ShipsCount == 0)
         {
             _endBattleView.SetLoseScreen();
-            //_autoBattleController.DeactivateAutoBAttle();
+            _soundManager.PlayEndScreenSound();
             SendEndBattleEvent();
             OnEndBattle?.Invoke();
+
+            var sequenc = DOTween.Sequence();
+            sequenc.AppendInterval(2);
+            sequenc.OnComplete(() => _soundManager.PlayLoseTheme());
         }
+    }
+
+    public void SendNearLoseEvent()
+    {
+        ReceiverGroup receiverGroup = ReceiverGroup.All;
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = receiverGroup };
+        SendOptions sendOptions = new SendOptions { Reliability = true };
+
+        PhotonNetwork.RaiseEvent((byte)(int)EventType.NearLose, _playerID, options, sendOptions);
     }
 
     public void SendEndBattleEvent()
@@ -61,6 +87,7 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
 
         PhotonNetwork.RaiseEvent((byte)(int)EventType.EndBattle, _playerID, options, sendOptions);
     }
+
     public void SendYesOrNoEvent(VoteType voteType)
     {
         ReceiverGroup receiverGroup = ReceiverGroup.All;
@@ -94,9 +121,13 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
                 if (_playerID != (string)photonEvent.CustomData)
                 {
                     _endBattleView.SetWinScreen();
-                    //_autoBattleController.DeactivateAutoBAttle();
+                    _soundManager.PlayVictoryTheme();
                     UpdateCharacterStatistics();
                     OnEndBattle?.Invoke();
+
+                    var sequenc = DOTween.Sequence();
+                    sequenc.AppendInterval(2);
+                    sequenc.OnComplete(() => _soundManager.PlayVictoryTheme());
                 }
                 break;
 
@@ -118,6 +149,14 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
                 {
                     _endBattleView.RestartButton.interactable = false;
                     _endBattleView.SetOpponentLeftGameState();
+                }
+                break;
+
+            case EventType.NearLose:
+
+                if (_playerID != (string)photonEvent.CustomData)
+                {
+                    _soundManager.PlayGameNearVictoryTheme();
                 }
                 break;
         }
@@ -190,7 +229,15 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
         }
     }
 
-    private void OutGame()
+    private void ExitGameDuringFight()
+    {
+        SendEndBattleEvent();  
+        PhotonNetwork.AutomaticallySyncScene = false;
+
+        ExiGame();
+    }
+
+    private void ExiGame()
     {
         PhotonNetwork.AutomaticallySyncScene = false;
         SendOutGameEvent();
@@ -205,6 +252,10 @@ public class EndBattleController : IOnEventCallback, ICleanable, IController
 
     public void CleanUp()
     {
-        
+        _endBattleView.PlayerYesButton.onClick.RemoveAllListeners();
+        _endBattleView.PlayerNoButton.onClick.RemoveAllListeners();
+        _endBattleView.RestartButton.onClick.RemoveAllListeners();
+        _endBattleView.ExitButton.onClick.RemoveAllListeners();
+        _gameMenuController.OnExitGame -= ExitGameDuringFight;
     }
 }
