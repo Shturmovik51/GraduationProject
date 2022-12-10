@@ -1,3 +1,7 @@
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,9 +9,12 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
-public class PlayerInfoView : MonoBehaviour
+public class PlayerInfoView : HidablePanel
 {
+    public event Action<bool> OnPlasementComplete;
+
     [SerializeField] private PlayerInfoViewType _viewType;
     [SerializeField] private TMP_Text _playerTitleText;
     [SerializeField] private TMP_Text _playerInfoText;
@@ -18,6 +25,7 @@ public class PlayerInfoView : MonoBehaviour
     public int ShipsCount { get; private set; }
 
     private List<Image> _shipMarkers;
+    private bool _isPlacementComplete;
     
     private void Start()
     {
@@ -57,12 +65,34 @@ public class PlayerInfoView : MonoBehaviour
 
             default:
                 break;
-        }  
+        }
+
+        CheckPlayerShipsOnField();
     }
+
     public void InitInfoView(string charName, int level, int experience, Sprite sprite)
     {
         _playerTitleText.text = charName;
         _playerInfoText.text = $"Level: {level} | Experience: {experience}";
         _plaerImage.sprite = sprite;
     }
+
+    private void CheckPlayerShipsOnField()
+    {
+        if(ShipsCount == 10)
+        {
+            _isPlacementComplete = true;
+            OnPlasementComplete(true);
+        }
+        else
+        {
+            if (_isPlacementComplete)
+            {
+                OnPlasementComplete(false);
+                _isPlacementComplete = false;
+            }
+        }
+    }
+
+    
 }

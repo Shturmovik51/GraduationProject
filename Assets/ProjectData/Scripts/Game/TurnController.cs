@@ -29,6 +29,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     private bool _isReadyForRoll;
     private bool _isRolling;
     private bool _isCompleteRolling;
+    private bool _isPanelsHide;
 
     public TurnController(List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, 
             List<FieldCell> opponentCellsLeft, List<FieldCell> opponentCellsRight, GameData gameData,
@@ -63,8 +64,34 @@ public class TurnController : IOnEventCallback, ICleanable, IController
         {
             cell.OnCellClick += CheckForChangeTurn;
         }
+        _playerInfoView.OnPlasementComplete += _actionsView.SetFinishedPlasemenStage;
+        _actionsView.HideButton.onClick.AddListener(HidePanels);
+
+        _actionsView.SetStartPosition();
+        _playerInfoView.SetStartPosition();
+        _opponentInfoView.SetStartPosition();
 
         StartPlacementStage();
+    }
+
+    private void HidePanels()
+    {
+        if (!_isPanelsHide)
+        {
+            _actionsView.HidePanel();
+            _playerInfoView.HidePanel();
+            _opponentInfoView.HidePanel();
+            _actionsView.SetHideOrUnhideImage(true);
+            _isPanelsHide = true;
+        }
+        else
+        {
+            _actionsView.ShowUpPanel();
+            _playerInfoView.ShowUpPanel();
+            _opponentInfoView.ShowUpPanel();
+            _actionsView.SetHideOrUnhideImage(false);
+            _isPanelsHide = false;
+        }
     }
 
     private void CheckForChangeTurn(FieldCell cell)
@@ -383,5 +410,6 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     {
         _mouseRaycaster.OnMissShoot -= SendChangeTurnEvent;
         _actionsView.ClearSubscribes();
+        _playerInfoView.OnPlasementComplete -= _actionsView.SetFinishedPlasemenStage;
     }
 }

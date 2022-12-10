@@ -17,7 +17,7 @@ public class AutoBattleView : MonoBehaviour
 
     public void RotateButton()
     {
-        _autoBattleButton.transform.Rotate(0, 0, 1);
+        _autoBattleButton.transform.Rotate(0, 0, -4);
     }
 
     public void UnsubscribeButton()

@@ -22,4 +22,5 @@ public enum EventType
     LeaveTheGame = 15,
     NearLose = 16,
     RestartBattle = 17,
+    PlacementComplete = 18,
 }

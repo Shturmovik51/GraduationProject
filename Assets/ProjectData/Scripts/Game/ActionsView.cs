@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class ActionsView : MonoBehaviour
+public class ActionsView : HidablePanel
 {
     [SerializeField] private TMP_Text _actionTitleText;
     [SerializeField] private TMP_Text _actionButtonText;
@@ -13,13 +14,23 @@ public class ActionsView : MonoBehaviour
     [SerializeField] private Button _actionButton;
     [SerializeField] private Image _plyerDiceImage;
     [SerializeField] private Image _opponentDiceImage;
-    [SerializeField] private List<DiceValue> _rollSystem;
-    [SerializeField] private Transform _hidePosition;
     [SerializeField] private Button _hideButton;
+    [SerializeField] private Image _toHideImage;
+    [SerializeField] private Image _toUnhideImage;
+    [SerializeField] private Image _clickHelpImage;
+    [SerializeField] private Image _moveHelpImage;
+
+    [SerializeField] private List<DiceValue> _rollSystem;
 
     public Button HideButton => _hideButton;
     public int PlayerRolledValue { get; private set; }
     public int OpponentRolledValue { get; private set; }
+
+    public void SetHideOrUnhideImage(bool isHidden)
+    {
+        _toHideImage.enabled = !isHidden;
+        _toUnhideImage.enabled = isHidden;
+    }
 
     public void SetPlacementStage(UnityAction action)
     {
@@ -29,6 +40,13 @@ public class ActionsView : MonoBehaviour
         _actionButtonText.text = "Ready To Battle";
 
         _actionButton.onClick.AddListener(action);
+        _clickHelpImage.enabled = true;
+    }    
+
+    public void SetFinishedPlasemenStage(bool isFinished)
+    {
+        _clickHelpImage.enabled = !isFinished;
+        _actionButton.gameObject.SetActive(isFinished);
     }
 
     public void SetRollStage(UnityAction action)
@@ -83,6 +101,7 @@ public class ActionsView : MonoBehaviour
         _opponentDiceImage.enabled = false;
         //_actionButton.gameObject.SetActive(true);
         //_actionButtonText.text = "Surrender";
+        _moveHelpImage.enabled = true;
         _actionButton.onClick.RemoveAllListeners();
         RefreshBattleStageUI(isPlayerTurn);
     }
@@ -101,6 +120,5 @@ public class ActionsView : MonoBehaviour
     {
         _actionButton.gameObject.SetActive(false);
         _plyerDiceImage.enabled = true;
-    }
-
+    }   
 }
