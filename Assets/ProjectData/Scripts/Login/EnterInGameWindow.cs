@@ -13,6 +13,7 @@ public class EnterInGameWindow : MonoBehaviour
     [SerializeField] private Canvas _signInCanvas;
     [SerializeField] private AwaiterWindow _awaiterWindow;
     [SerializeField] private LobbyScreen _lobbyScreen;
+    [SerializeField] private MutePanelView _mutePanelView;
 
     private SoundManager _soundManager;
     private SceneLoader _sceneLoader;
@@ -29,7 +30,10 @@ public class EnterInGameWindow : MonoBehaviour
         _signInButton.onClick.AddListener(OpenSignInWindow);
         _createAcciuntButton.onClick.AddListener(OpenCreateAccountWindow);
         _soundManager.SubscribeMenuButtons();
-        _soundManager.PlayMenuSound();
+        _mutePanelView.Init();
+        _mutePanelView.SetMuteState(_soundManager.IsMuted);
+        _mutePanelView.SubscribeButton(_soundManager.MuteOrUnmuteSound);
+        //_soundManager.PlayMenuSound();
 
         if (PlayerPrefs.HasKey("LoggedIn"))
         {

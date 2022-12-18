@@ -184,7 +184,7 @@ public class Ship : MonoBehaviour
             {
                 if(hit.collider.TryGetComponent<FieldCell>(out var cell))
                 {
-                    cell.InitAction();
+                    cell.InitExplosionRadius();
                     cell.SetUnableToClick(true);
                 }
             }

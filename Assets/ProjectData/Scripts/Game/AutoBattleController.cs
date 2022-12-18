@@ -44,7 +44,7 @@ public class AutoBattleController :IUpdatable, ICleanable, IController
     {
         if (_isAutobattle)
         {
-            _autoBattleView.RotateButton();
+            _autoBattleView.RotateButton(deltaTime);
         }
     }
 

@@ -15,9 +15,9 @@ public class AutoBattleView : MonoBehaviour
         _autoBattleButton.onClick.AddListener(action);
     }
 
-    public void RotateButton()
+    public void RotateButton(float delta)
     {
-        _autoBattleButton.transform.Rotate(0, 0, -4);
+        _autoBattleButton.transform.Rotate(0, 0, -20 * delta);
     }
 
     public void UnsubscribeButton()

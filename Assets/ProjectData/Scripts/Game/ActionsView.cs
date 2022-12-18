@@ -101,6 +101,7 @@ public class ActionsView : HidablePanel
         _opponentDiceImage.enabled = false;
         //_actionButton.gameObject.SetActive(true);
         //_actionButtonText.text = "Surrender";
+        _clickHelpImage.enabled = false;
         _moveHelpImage.enabled = true;
         _actionButton.onClick.RemoveAllListeners();
         RefreshBattleStageUI(isPlayerTurn);

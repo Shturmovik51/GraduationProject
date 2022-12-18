@@ -64,7 +64,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
         {
             cell.OnCellClick += CheckForChangeTurn;
         }
-        _playerInfoView.OnPlasementComplete += _actionsView.SetFinishedPlasemenStage;
+        _playerInfoView.OnPlacementComplete += _actionsView.SetFinishedPlasemenStage;
         _actionsView.HideButton.onClick.AddListener(HidePanels);
 
         _actionsView.SetStartPosition();
@@ -403,6 +403,7 @@ public class TurnController : IOnEventCallback, ICleanable, IController
         _actionsView.SetBattleStage(rollResult);
         _opponentInfoView.SetInfoTextVisibility(true);
         _mouseRaycaster.SetHitCellAvaliability(rollResult);
+        _playerInfoView.OnPlacementComplete -= _actionsView.SetFinishedPlasemenStage;
         OnStartBattle?.Invoke();
     }
 
@@ -410,6 +411,6 @@ public class TurnController : IOnEventCallback, ICleanable, IController
     {
         _mouseRaycaster.OnMissShoot -= SendChangeTurnEvent;
         _actionsView.ClearSubscribes();
-        _playerInfoView.OnPlasementComplete -= _actionsView.SetFinishedPlasemenStage;
+        _playerInfoView.OnPlacementComplete -= _actionsView.SetFinishedPlasemenStage;
     }
 }

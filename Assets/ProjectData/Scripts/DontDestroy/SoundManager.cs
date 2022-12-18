@@ -22,9 +22,11 @@ public class SoundManager : MonoBehaviour
 
     private List<AnimatedButton> _menuButtons;
     private List<AnimatedButton> _gameButtons;
+    private List<AnimatedButton> _startSceneButtons;
 
     private List<AudioSource> _shipsAudioSourses;
     private List<AudioSource> _cellsAudioSourses;
+    public bool IsMuted { get; private set; }
 
     private void Awake()
     {
@@ -43,6 +45,8 @@ public class SoundManager : MonoBehaviour
 
     private void LoadSoundOptions()
     {
+        if (IsMuted) return;
+
         if (PlayerPrefs.HasKey($"MusicSoundOptions"))
         {
             SetMusicValue(PlayerPrefs.GetFloat($"MusicSoundOptions"));
@@ -52,6 +56,21 @@ public class SoundManager : MonoBehaviour
         {
             SetEffectsValue(PlayerPrefs.GetFloat($"EffectsSoundOptions"));
         }        
+    }
+
+    public void MuteOrUnmuteSound()
+    {
+        IsMuted = !IsMuted;
+
+        if (IsMuted)
+        {
+            SetMusicValue(0);
+            SetEffectsValue(0);
+        }
+        else
+        {
+            LoadSoundOptions();
+        }
     }
 
     public void PlayMenuSound()
@@ -111,33 +130,38 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void SubscribeStartScreenButtons()
+    {
+        FindAndSubscribeButtons(_startSceneButtons);
+    }
+
     public void SubscribeMenuButtons()
     {
-        if (_menuButtons != null)
-        {
-            _menuButtons.Clear();
-        }
-
-        _menuButtons = FindObjectsOfType<AnimatedButton>().ToList();
-        foreach (var button in _menuButtons)
-        {
-            button.onClick.AddListener(() => _click.Play());
-            button.OnPointerEnterEvent += () => _onPointerEnter.Play();
-        }
+        FindAndSubscribeButtons(_menuButtons);
     }
 
     public void SubscribeGameButtons()
     {
-        if(_gameButtons != null)
+        FindAndSubscribeButtons(_gameButtons);
+    }
+
+    private void FindAndSubscribeButtons(List<AnimatedButton> buttonsCollection)
+    {
+        if (buttonsCollection != null)
         {
-            _gameButtons.Clear();
+            buttonsCollection.Clear();
+        }
+        else
+        {
+            buttonsCollection = new List<AnimatedButton>();
         }
 
-        _gameButtons = FindObjectsOfType<AnimatedButton>().ToList();
-        foreach (var button in _gameButtons)
+        var buttons = FindObjectsOfType<AnimatedButton>().ToList();
+        foreach (var button in buttons)
         {
             button.onClick.AddListener(() => _click.Play());
             button.OnPointerEnterEvent += () => _onPointerEnter.Play();
+            buttonsCollection.Add(button);
         }
     }
 

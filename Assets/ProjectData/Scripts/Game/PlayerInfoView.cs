@@ -13,7 +13,7 @@ using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class PlayerInfoView : HidablePanel
 {
-    public event Action<bool> OnPlasementComplete;
+    public event Action<bool> OnPlacementComplete;
 
     [SerializeField] private PlayerInfoViewType _viewType;
     [SerializeField] private TMP_Text _playerTitleText;
@@ -82,13 +82,13 @@ public class PlayerInfoView : HidablePanel
         if(ShipsCount == 10)
         {
             _isPlacementComplete = true;
-            OnPlasementComplete(true);
+            OnPlacementComplete?.Invoke(true);
         }
         else
         {
             if (_isPlacementComplete)
             {
-                OnPlasementComplete(false);
+                OnPlacementComplete?.Invoke(false);
                 _isPlacementComplete = false;
             }
         }

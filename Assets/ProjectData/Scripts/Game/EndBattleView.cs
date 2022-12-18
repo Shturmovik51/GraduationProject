@@ -51,7 +51,7 @@ public class EndBattleView : MonoBehaviour
         _victoryTitleText.enabled = true;
         _victoryPraiseText.enabled = true;
         _revardTitleText.enabled = true;
-        _revardText.text = "Experiense + 100";
+        _revardText.text = "Experience + 300";
         _revardText.enabled = true;
         _screenCanvas.enabled = true;
     }

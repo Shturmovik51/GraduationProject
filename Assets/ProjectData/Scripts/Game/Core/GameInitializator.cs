@@ -12,26 +12,30 @@ namespace Engine
             List<FieldCell> masterCellsLeft, List<FieldCell> masterCellsRight, List<FieldCell> opponentCellsLeft,
                 List<FieldCell> opponentCellsRight, LoadedPlayersInfo playerInfo, GameData gameData)
         {
-            var sounrManager = Object.FindObjectOfType<SoundManager>();
+            var soundManager = Object.FindObjectOfType<SoundManager>();
             var sceneLoader = Object.FindObjectOfType<SceneLoader>();
 
             sceneLoader.CompleteLoadScene();
-            sounrManager.AddShipsAudioSources();
-            sounrManager.AddCellsAudioSources();
-            sounrManager.SubscribeGameButtons();
-            sounrManager.PlayGameMainTheme();
+            soundManager.AddShipsAudioSources();
+            soundManager.AddCellsAudioSources();
+            soundManager.SubscribeGameButtons();
+            soundManager.PlayGameMainTheme();
+
+            gameData.MutePanelView.Init();
+            gameData.MutePanelView.SetMuteState(soundManager.IsMuted);
+            gameData.MutePanelView.SubscribeButton(soundManager.MuteOrUnmuteSound);
 
             var inputSystemController = new InputSystemController();
             var userInput = inputSystemController.GetInputSystem();
 
             var shipMoveController = new ShipMoveController(userInput);
-            var gameMenuController = new GameMenuController(gameData, userInput, sounrManager, playerInfo);
+            var gameMenuController = new GameMenuController(gameData, userInput, soundManager, playerInfo);
             var mouseRaycaster = new MouseRaycaster(userInput, shipMoveController, gameMenuController);
 
             var playerFieldController = new PlayerFieldController(userInput, playerFieldView, gameMenuController);
 
             var endBattleController = new EndBattleController(gameData, playerInfo, gameMenuController, 
-                    sounrManager, sceneLoader, mouseRaycaster);
+                    soundManager, sceneLoader, mouseRaycaster);
 
             var shipsManager = new ShipsManager(gameData, playerInfo, masterCellsRight, opponentCellsRight, endBattleController);
 

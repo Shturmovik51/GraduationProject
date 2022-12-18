@@ -46,6 +46,11 @@ public class CharacterWindow : MonoBehaviourPunCallbacks
         }
     }
 
+    private void Start()
+    {
+        _creationPanel.SetActive(false);
+    }
+
     public void OpenCharacterScreen()
     {
         _characterScreenCanvas.enabled = true;

@@ -20,9 +20,11 @@ public class GameData
     [field: SerializeField] public EndBattleView EndBattleView;
     [field: SerializeField] public AvatarsConfig AvatarsConfig;
     [field: SerializeField] public AutoBattleView AutoBattleView;
+    [field: SerializeField] public MutePanelView MutePanelView; 
 
     [field: SerializeField] public Transform MasterTransform;
     [field: SerializeField] public Transform OpponentTransform;
+
 
     [SerializeField] private GameMenuView _masterGameMenuView;
     [SerializeField] private GameMenuView _opponentGameMenuView;
