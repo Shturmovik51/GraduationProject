@@ -19,8 +19,8 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: dev
     UseNameServer: 1
-    FixedRegion: 
-    Server: 
+    FixedRegion: ru
+    Server: ns.photonengine.io
     Port: 0
     ProxyServer: 
     Protocol: 0
@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 5
-  DevRegion: ru
+  DevRegion: 
   PunLogging: 2
   EnableSupportLogger: 0
   RunInBackground: 1

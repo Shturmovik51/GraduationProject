@@ -41,8 +41,15 @@ public class LobbyScreen : MonoBehaviourPunCallbacks
 
             PhotonNetwork.AuthValues = new AuthenticationValues(_userID);
             PhotonNetwork.NickName = _playerName;
-            PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = PhotonNetwork.AppVersion;
+
+            AppSettings ruSettings = new AppSettings();
+            ruSettings.UseNameServer = true;
+            //ruSettings.Server = "ns.photonengine.ru";
+            ruSettings.AppIdRealtime = "d3eaecdf-ce66-4783-a6af-2562974b9d51";
+
+            PhotonNetwork.ConnectUsingSettings(ruSettings);
+            //PhotonNetwork.ConnectToRegion("ru");
             PhotonNetwork.AutomaticallySyncScene = true;
         }
 
