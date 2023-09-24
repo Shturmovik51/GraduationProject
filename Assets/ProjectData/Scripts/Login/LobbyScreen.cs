@@ -45,7 +45,7 @@ public class LobbyScreen : MonoBehaviourPunCallbacks
 
             AppSettings ruSettings = new AppSettings();
             ruSettings.UseNameServer = true;
-            //ruSettings.Server = "ns.photonengine.ru";
+            ruSettings.Server = "ns.photonengine.io";
             ruSettings.AppIdRealtime = "d3eaecdf-ce66-4783-a6af-2562974b9d51";
 
             PhotonNetwork.ConnectUsingSettings(ruSettings);
